@@ -1,0 +1,249 @@
+---
+// Photo gallery — CSS-columns masonry + no-dependency lightbox.
+// Mirrors the dccustomguitars Gallery: explicit static imports, getImage() to
+// pre-generate an optimized full-size WebP for the lightbox (so we never serve
+// the multi-megabyte originals), vanilla-JS keyboard + backdrop close.
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro:assets';
+import g01 from '~/assets/images/gallery/gallery_01.jpg';
+import g02 from '~/assets/images/gallery/gallery_02.jpg';
+import g03 from '~/assets/images/gallery/gallery_03.jpg';
+import g04 from '~/assets/images/gallery/gallery_04.jpg';
+import g05 from '~/assets/images/gallery/gallery_05.jpg';
+import g06 from '~/assets/images/gallery/gallery_06.jpg';
+import g07 from '~/assets/images/gallery/gallery_07.jpg';
+import g08 from '~/assets/images/gallery/gallery_08.jpg';
+import g09 from '~/assets/images/gallery/gallery_09.jpg';
+import g10 from '~/assets/images/gallery/gallery_10.jpg';
+import g11 from '~/assets/images/gallery/gallery_11.jpg';
+import g12 from '~/assets/images/gallery/gallery_12.jpg';
+import g13 from '~/assets/images/gallery/gallery_13.jpg';
+import g14 from '~/assets/images/gallery/gallery_14.jpg';
+import g15 from '~/assets/images/gallery/gallery_15.jpg';
+import g16 from '~/assets/images/gallery/gallery_16.jpg';
+import g17 from '~/assets/images/gallery/gallery_17.jpg';
+import g18 from '~/assets/images/gallery/gallery_18.png';
+import g19 from '~/assets/images/gallery/gallery_19.jpg';
+import g20 from '~/assets/images/gallery/gallery_20.jpg';
+import g21 from '~/assets/images/gallery/gallery_21.jpg';
+import g22 from '~/assets/images/gallery/gallery_22.jpg';
+import g23 from '~/assets/images/gallery/gallery_23.jpg';
+import g24 from '~/assets/images/gallery/gallery_24.jpg';
+import g25 from '~/assets/images/gallery/gallery_25.jpg';
+import g26 from '~/assets/images/gallery/gallery_26.jpg';
+import g27 from '~/assets/images/gallery/gallery_27.jpg';
+import g28 from '~/assets/images/gallery/gallery_28.jpg';
+import g29 from '~/assets/images/gallery/gallery_29.jpg';
+import g30 from '~/assets/images/gallery/gallery_30.jpg';
+import g31 from '~/assets/images/gallery/gallery_31.jpg';
+import g32 from '~/assets/images/gallery/gallery_32.jpg';
+import g33 from '~/assets/images/gallery/gallery_33.jpg';
+import g34 from '~/assets/images/gallery/gallery_34.jpg';
+import g35 from '~/assets/images/gallery/gallery_35.jpg';
+import g36 from '~/assets/images/gallery/gallery_36.jpg';
+import g37 from '~/assets/images/gallery/gallery_37.jpg';
+import g38 from '~/assets/images/gallery/gallery_38.jpg';
+import g39 from '~/assets/images/gallery/gallery_39.jpg';
+import g40 from '~/assets/images/gallery/gallery_40.jpg';
+import g41 from '~/assets/images/gallery/gallery_41.jpg';
+import g42 from '~/assets/images/gallery/gallery_42.jpg';
+import g43 from '~/assets/images/gallery/gallery_43.jpg';
+import g44 from '~/assets/images/gallery/gallery_44.jpg';
+import g45 from '~/assets/images/gallery/gallery_45.png';
+import g46 from '~/assets/images/gallery/gallery_46.jpg';
+import g47 from '~/assets/images/gallery/gallery_47.jpg';
+import g48 from '~/assets/images/gallery/gallery_48.jpg';
+import g49 from '~/assets/images/gallery/gallery_49.jpg';
+import g50 from '~/assets/images/gallery/gallery_50.jpg';
+import g51 from '~/assets/images/gallery/gallery_51.jpg';
+import g52 from '~/assets/images/gallery/gallery_52.jpg';
+import g53 from '~/assets/images/gallery/gallery_53.jpg';
+import g54 from '~/assets/images/gallery/gallery_54.jpg';
+import g55 from '~/assets/images/gallery/gallery_55.jpg';
+import g56 from '~/assets/images/gallery/gallery_56.jpg';
+import g57 from '~/assets/images/gallery/gallery_57.jpg';
+import g58 from '~/assets/images/gallery/gallery_58.jpg';
+
+const galleryPhotos: Array<{ src: ImageMetadata; alt: string }> = [
+  { src: g01, alt: 'Dean Cascione with Uli Jon Roth and Joe Stump' },
+  { src: g02, alt: 'Dean Cascione performing at Club Jewel' },
+  { src: g03, alt: 'Dean Cascione with Floyd Rose' },
+  { src: g04, alt: 'Dean Cascione with Michael Angelo Batio' },
+  { src: g05, alt: 'Dean Cascione with Jason Becker' },
+  { src: g06, alt: 'Dean Cascione at Club Jewel' },
+  { src: g07, alt: 'Dean Cascione with ZT Amplifiers' },
+  { src: g08, alt: 'Dean Cascione with Joe Stump' },
+  { src: g09, alt: 'Dean Cascione with Bell and Johannsen' },
+  { src: g10, alt: 'Dean Cascione with Jimi Bell' },
+  { src: g11, alt: 'Dean Cascione with Lizard Spit' },
+  { src: g12, alt: 'Dean Cascione with Chris Impellitteri' },
+  { src: g13, alt: 'Dean Cascione at Club Jewel' },
+  { src: g14, alt: 'Dean Cascione with Robert Stone Tone and Floyd Rose' },
+  { src: g15, alt: 'Dean Cascione with Patrik Johannson' },
+  { src: g16, alt: 'Dean Cascione with Ghee Yeh' },
+  { src: g17, alt: 'Dean Cascione with Jeff Loomis' },
+  { src: g18, alt: 'Dean Cascione with George Lynch' },
+  { src: g19, alt: 'Dean Cascione with Joe Stump' },
+  { src: g20, alt: 'Dean Cascione with Seymour Duncan' },
+  { src: g21, alt: 'Dean Cascione with Floyd Rose' },
+  { src: g22, alt: 'Dean Cascione with Hoogie and SIT Strings' },
+  { src: g23, alt: 'Dean Cascione with Matthew Mills' },
+  { src: g24, alt: 'Dean Cascione with Viper Guitars' },
+  { src: g25, alt: 'Dean Cascione with Bruce Kulick' },
+  { src: g26, alt: 'Dean Cascione with Maxx Carlisle' },
+  { src: g27, alt: 'Dean Cascione — Seymour Duncan Tone Queen' },
+  { src: g28, alt: 'Dean Cascione with Vinnie Moore' },
+  { src: g29, alt: 'Dean Cascione with Kelly Garni — Quiet Riot' },
+  { src: g30, alt: 'Dean Cascione with Jason Boston — Bassman' },
+  { src: g31, alt: 'Dean Cascione with Tony Rombola' },
+  { src: g32, alt: 'Dean Cascione with OZ Guitars' },
+  { src: g33, alt: 'Dean Cascione with Graphtech' },
+  { src: g34, alt: 'Dean Cascione — DOD and Digitech' },
+  { src: g35, alt: 'Dean Cascione with Ronnie North' },
+  { src: g36, alt: 'Dean Cascione at Splunk Conf' },
+  { src: g37, alt: 'Dean Cascione with Rudy Sarzo' },
+  { src: g38, alt: 'Dean Cascione with Adrian Vandenburg' },
+  { src: g39, alt: 'Dean Cascione — California shoot' },
+  { src: g40, alt: 'Dean Cascione with Brad Gillis and Floyd Rose' },
+  { src: g41, alt: 'Dean Cascione with Joe Stump' },
+  { src: g42, alt: 'Dean Cascione with Kelly Simonz' },
+  { src: g43, alt: 'Dean Cascione with Floyd Rose' },
+  { src: g44, alt: 'Dean Cascione with Andy Timmons' },
+  { src: g45, alt: 'Dean Cascione and Maxx Carlisle — shred guitar' },
+  { src: g46, alt: 'Dean Cascione with Graphtech' },
+  { src: g47, alt: 'Dean Cascione — Bones Guitar' },
+  { src: g48, alt: 'Dean Cascione with Lizard Spit' },
+  { src: g49, alt: 'Dean Cascione at Spider Gates' },
+  { src: g50, alt: 'Seymour Duncan Evolin with Dean Cascione' },
+  { src: g51, alt: 'Dean Cascione with SIT Strings' },
+  { src: g52, alt: 'Stone Tone Rock Block with Dean Cascione' },
+  { src: g53, alt: 'Dean Cascione at the Oxford Crypt' },
+  { src: g54, alt: 'Dean Cascione playing double guitar' },
+  { src: g55, alt: 'Dean Cascione — Evolin Floyd Rose' },
+  { src: g56, alt: 'Dean Cascione and Maxx' },
+  { src: g57, alt: 'Dean Cascione with Tony Rombola' },
+  { src: g58, alt: 'Dean Cascione — 2026 Metal Warrior' },
+];
+
+// Pre-generate an optimized full-size WebP for the lightbox so we don't serve
+// the raw originals. 1600px wide, quality 78 — sharp enough full-screen.
+const photos = await Promise.all(
+  galleryPhotos.map(async (photo) => {
+    const full = await getImage({
+      src: photo.src,
+      width: 1600,
+      format: 'webp',
+      quality: 78,
+    });
+    return { ...photo, fullSrc: full.src };
+  }),
+);
+---
+
+<section class="section" id="gallery">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">Gallery</span>
+      <h2 class="section-title">In Good Company</h2>
+      <p class="section-subtitle">
+        On stage and off — with the guitarists, builders, and brands that shape
+        the shred community. Tap any photo to enlarge.
+      </p>
+    </div>
+
+    <div class="gallery__grid">
+      {photos.map((photo, i) => (
+        <button
+          class="gallery__item"
+          data-full={photo.fullSrc}
+          data-index={i}
+          aria-label={`View photo ${i + 1}: ${photo.alt}`}
+        >
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            widths={[300, 400, 500, 640]}
+            sizes="(max-width: 540px) 100vw, (max-width: 640px) 50vw, 33vw"
+            loading={i < 6 ? 'eager' : 'lazy'}
+          />
+        </button>
+      ))}
+    </div>
+
+    <div class="gallery__lightbox" id="galleryLightbox" aria-hidden="true">
+      <button class="gallery__close" id="galleryClose" aria-label="Close gallery">&times;</button>
+      <button class="gallery__nav gallery__nav--prev" id="galleryPrev" aria-label="Previous photo">&#8249;</button>
+      <img class="gallery__fullimg" id="galleryFullImg" src="" alt="" />
+      <button class="gallery__nav gallery__nav--next" id="galleryNext" aria-label="Next photo">&#8250;</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  const items = document.querySelectorAll<HTMLButtonElement>('.gallery__item');
+  const lightbox = document.getElementById('galleryLightbox');
+  const fullImg = document.getElementById('galleryFullImg') as HTMLImageElement | null;
+  const closeBtn = document.getElementById('galleryClose');
+  const prevBtn = document.getElementById('galleryPrev');
+  const nextBtn = document.getElementById('galleryNext');
+
+  let currentIndex = 0;
+
+  function showImage() {
+    const item = items[currentIndex];
+    if (!item || !fullImg) return;
+    fullImg.src = item.dataset.full ?? '';
+    fullImg.alt = item.getAttribute('aria-label') ?? '';
+  }
+
+  function open(index: number) {
+    currentIndex = index;
+    showImage();
+    lightbox?.classList.add('is-open');
+    lightbox?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    lightbox?.classList.remove('is-open');
+    lightbox?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function next() {
+    currentIndex = (currentIndex + 1) % items.length;
+    showImage();
+  }
+
+  function prev() {
+    currentIndex = (currentIndex - 1 + items.length) % items.length;
+    showImage();
+  }
+
+  items.forEach((item, i) => {
+    item.addEventListener('click', () => open(i));
+  });
+
+  closeBtn?.addEventListener('click', close);
+  nextBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    next();
+  });
+  prevBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    prev();
+  });
+
+  // Click the backdrop (not a child) to close.
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) close();
+  });
+
+  // Keyboard: Esc closes, arrows navigate — only when lightbox is open.
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox?.classList.contains('is-open')) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowRight') next();
+    else if (e.key === 'ArrowLeft') prev();
+  });
+</script>

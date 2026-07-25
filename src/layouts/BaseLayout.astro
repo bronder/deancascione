@@ -1,0 +1,91 @@
+---
+import '~/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Dean Cascione — Neoclassical Shred Guitarist',
+  description = 'American neoclassical shred guitarist Dean Cascione — instrumental rock, metal, and solo work. Chart-topping debut, MANOWAR Dio tribute, NAMM performer. Discography, endorsements, performances, and bookings.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+// OG image: must be a stable, non-hashed absolute URL for social scrapers.
+// Served from public/og-hero.jpg (never run through astro:assets).
+const ogImage = new URL('og-hero.jpg', Astro.site).toString();
+// Base-relative prefix for static public/ assets (favicons, manifest).
+const assetBase = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon" type="image/svg+xml" href={`${assetBase}/favicon.svg`} />
+    <link rel="icon" type="image/png" sizes="32x32" href={`${assetBase}/favicon-32.png`} />
+    <link rel="apple-touch-icon" sizes="180x180" href={`${assetBase}/apple-touch-icon.png`} />
+    <link rel="manifest" href={`${assetBase}/site.webmanifest`} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Fonts: preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Structured data: helps search engines understand the artist.
+         MusicGroup is schema.org's type for a musical act / band / solo artist. -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'MusicGroup',
+      name: 'Dean Cascione',
+      description: 'American neoclassical shred guitarist — instrumental rock and metal solo artist, session player, and clinician.',
+      url: canonical,
+      image: ogImage,
+      genre: ['Neoclassical metal', 'Shred guitar', 'Instrumental rock'],
+      email: 'dean@deancascione.com',
+      sameAs: [
+        'https://www.youtube.com/user/deancascione',
+        'https://www.facebook.com/deancascione',
+        'https://www.instagram.com/deancascione',
+        'https://deancascione.com',
+      ],
+      album: [
+        { '@type': 'MusicAlbum', name: 'Guitar Chop Shop', datePublished: '2008' },
+        { '@type': 'MusicAlbum', name: 'Neoclassical Fire', datePublished: '2011' },
+        { '@type': 'MusicAlbum', name: 'Shred Crusade', datePublished: '2015' },
+        { '@type': 'MusicAlbum', name: 'Magic: A Tribute to Ronnie James Dio', datePublished: '2010' },
+      ],
+      track: [
+        { '@type': 'MusicRecording', name: 'Doppelgangers', datePublished: '2026' },
+        { '@type': 'MusicRecording', name: 'Mission Space', datePublished: '2024' },
+        { '@type': 'MusicRecording', name: 'Odyssey of Darkness', datePublished: '2024' },
+        { '@type': 'MusicRecording', name: 'Between Two Anvils', datePublished: '2023' },
+        { '@type': 'MusicRecording', name: 'Rhoads Rising', datePublished: '2020' },
+        { '@type': 'MusicRecording', name: 'Clash of the Titans', datePublished: '2018' },
+      ],
+    })} />
+  </head>
+  <body>
+    <a href="#main" class="sr-only">Skip to main content</a>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,58 @@
+---
+// About — biography + pull-quote + portrait
+import { Image } from 'astro:assets';
+import portrait from '~/assets/images/portrait.jpg';
+---
+
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">Biography</span>
+      <h2 class="section-title">American Metal, Melodic Heart</h2>
+    </div>
+
+    <div class="about">
+      <div class="about__body">
+        <p>
+          Dean Cascione is an American Metal guitarist and an innovative force in
+          today's instrumental rock scene. Committed to shattering shred
+          stereotypes, he delivers melodic music, charged with passion and
+          contrast.
+        </p>
+
+        <div class="about__quote">
+          A showcase of Neoclassical fretboard pyrotechnics… channels the spirit
+          of Rhoads and the best of Malmsteen.
+          <span class="about__attrib">— Press</span>
+        </div>
+
+        <p>
+          Praised as &ldquo;dangerous with a guitar&rdquo; and &ldquo;a bright
+          star on the international guitar scene,&rdquo; Dean has released
+          multiple acclaimed albums and collaborated with legends in the metal
+          world. His debut <em>Guitar Chop Shop</em> topped charts in 2008, and
+          he's continued to push boundaries with releases like
+          <em>Neoclassical Fire</em> (2011) and <em>Shred Crusade</em> (2015).
+        </p>
+
+        <p>
+          In 2010, Dean recorded with MANOWAR on the worldwide release
+          <em>MAGIC: A Tribute to Ronnie James Dio</em>. Drawing inspiration from
+          Cacophony &amp; Racer X, he joined forces with &ldquo;Guitar
+          Maxx&rdquo; Maxxwell Carlisle to release several singles. Dean has
+          performed at festivals, clinics, and shows across the country.
+        </p>
+      </div>
+
+      <figure class="about__portrait">
+        <Image
+          src={portrait}
+          alt="Dean Cascione — portrait"
+          widths={[300, 480, 640]}
+          sizes="(max-width: 880px) 100vw, 480px"
+          loading="lazy"
+        />
+      </figure>
+    </div>
+  </div>
+</section>

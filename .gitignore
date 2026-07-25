@@ -1,0 +1,22 @@
+# build output
+dist/
+
+# dependencies
+node_modules/
+
+# astro cache
+.astro/
+
+# environment
+.env
+.env.production
+
+# OS / editor
+.DS_Store
+*.log
+
+# local dev artifacts
+screenshot-*.png
+.zcode/
+.playwright-mcp/
+/*.png

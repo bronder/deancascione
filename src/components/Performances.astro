@@ -1,0 +1,78 @@
+---
+// Performances & Accomplishments — highlights + services offered
+type Show = {
+  title: string;
+  desc: string;
+};
+
+const shows: Show[] = [
+  {
+    title: 'NAMM Show — 10+ Year Performer (2014–2026)',
+    desc: 'A recurring presence on prominent NAMM stages, engaging with musicians, industry leaders, and gear enthusiasts. Underscores his role as a respected voice in the guitar community.',
+  },
+  {
+    title: 'Splunk Conf 2025',
+    desc: 'Brought his original music to tech and enterprise audiences in a high-profile keynote environment.',
+  },
+  {
+    title: 'Guitar Summit 2020',
+    desc: 'Appeared alongside genre shred guitar icons Joe Stump and Jimi Bell.',
+  },
+  {
+    title: 'SENE Music & Film Festival — 2016 & 2018',
+    desc: 'Dynamic performances in a celebrated arts-and-culture setting.',
+  },
+];
+
+const services = [
+  'Live performance engagements',
+  'Private, online, or in-studio guitar lessons (beginner to advanced)',
+  'Prototype testing & product demos',
+  'Private guitar clinics',
+];
+---
+
+<section class="section section--elevated" id="shows">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">Performances &amp; Accomplishments</span>
+      <h2 class="section-title">Two Decades On Stage</h2>
+      <p class="section-subtitle">
+        An internationally recognized guitarist, clinician, and performer with a
+        career spanning more than two decades of high-energy live appearances —
+        at trade shows, music festivals, film festivals, guitar clinics, and
+        instructional bootcamps.
+      </p>
+    </div>
+
+    <div class="shows">
+      <div class="shows__list">
+        {shows.map((s) => (
+          <article class="show">
+            <h3 class="show__title">{s.title}</h3>
+            <p class="show__desc">{s.desc}</p>
+          </article>
+        ))}
+        <article class="show">
+          <h3 class="show__title">Chart-Topping Debut &amp; Dio Tribute</h3>
+          <p class="show__desc">
+            Debut album <em>Guitar Chop Shop</em> (2008) earned Guitar9 Records'
+            #1 chart ranking. Featured on <em>Magic: A Tribute to Ronnie James
+            Dio</em> — curated by Magic Circle Music and MANOWAR — with his
+            original instrumental &ldquo;Never More.&rdquo;
+          </p>
+        </article>
+      </div>
+
+      <aside class="services">
+        <h3 class="services__title">Available For</h3>
+        <ul class="services__list">
+          {services.map((s) => (
+            <li>{s}</li>
+          ))}
+        </ul>
+        <a href="#contact" class="btn btn--primary">Get in Touch</a>
+      </aside>
+    </div>
+  </div>
+</section>

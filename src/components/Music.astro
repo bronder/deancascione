@@ -1,0 +1,155 @@
+---
+// Music — featured videos + discography timeline + free e-book
+import { Image } from 'astro:assets';
+import ebookCover from '~/assets/images/ebook-cover.jpg';
+
+// Newest-first discography. `title` and `note` preserved verbatim from the
+// legacy bio; `video` marks releases with an embedded YouTube link.
+type Release = {
+  year: string;
+  title: string;
+  note: string;
+};
+
+const releases: Release[] = [
+  { year: '2026', title: 'Doppelgangers', note: 'Single — collaboration with Maxxwell Carlisle.' },
+  { year: '2024', title: 'Mission Space', note: 'Single.' },
+  { year: '2024', title: 'Odyssey of Darkness', note: 'Single — collaboration with Maxxwell Carlisle.' },
+  { year: '2023', title: 'Between Two Anvils', note: 'Single — collaboration with Maxxwell Carlisle.' },
+  { year: '2020', title: 'Rhoads Rising', note: 'Single — tribute to Randy Rhoads.' },
+  {
+    year: '2018',
+    title: 'Clash of the Titans',
+    note: 'Single — featuring American guitar virtuosos Dean Cascione, Jimi Mitchell, Mike Kerr, and Matthew Mills.',
+  },
+  {
+    year: '2017',
+    title: 'Guitar Symphony',
+    note: 'Global collaboration with over 60 guitarists including George Bellas, Rusty Cooley, and Matt Mills.',
+  },
+  {
+    year: '2016',
+    title: 'Live at the SENE Film & Music Festival',
+    note: 'Limited-edition live Blu-ray performance.',
+  },
+  {
+    year: '2016',
+    title: 'The Dark Lord Rises / Brothers in Shred',
+    note: 'Featured on Joe Stump\'s Lion Music release.',
+  },
+  {
+    year: '2015',
+    title: 'Shred Crusade',
+    note: 'Album — neoclassic metal with guest guitarists David Shankle, Dave Mercado, and Joe Stump.',
+  },
+  {
+    year: '2011',
+    title: 'Neoclassical Fire',
+    note: 'Album — collaboration with keyboardist Mike Troy (Yngwie Malmsteen).',
+  },
+  {
+    year: '2010',
+    title: 'Magic: A Tribute to Ronnie James Dio',
+    note: 'Album — worldwide release with MANOWAR, featuring instrumental cover of "Nevermore."',
+  },
+  {
+    year: '2008',
+    title: 'Guitar Chop Shop',
+    note: 'Debut album — #1 in sales on Guitar9 charts.',
+  },
+];
+
+// External download links to the existing host (per build decision: keep the
+// ~120MB e-book + audio bundle on the old host, repo stays light).
+const EBOOK_URL = 'https://deancascione.com/ebook/The%20Neoclassic%20approach%20to%20Shred%20Guitar.pdf';
+const AUDIO_URL = 'https://deancascione.com/ebook/Audio_files.rar';
+---
+
+<section class="section section--elevated" id="music">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">Music</span>
+      <h2 class="section-title">Discography &amp; Videos</h2>
+      <p class="section-subtitle">
+        Two decades of neoclassical shred — solo albums, global collaborations,
+        and tribute work alongside the legends of metal.
+      </p>
+    </div>
+
+    <div class="music__videos">
+      <article class="video-card">
+        <div class="video-card__media">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/VEPlyiegWJQ"
+            title="Dean Cascione — Mission Space"
+            loading="lazy"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="video-card__body">
+          <p class="video-card__label">Original</p>
+          <h3 class="video-card__title">Mission Space</h3>
+        </div>
+      </article>
+
+      <article class="video-card">
+        <div class="video-card__media">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/mkC3Xxem2Ns"
+            title="Dean Cascione & Maxxwell Carlisle — Doppelgangers"
+            loading="lazy"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <div class="video-card__body">
+          <p class="video-card__label">Latest Release · feat. Maxxwell Carlisle</p>
+          <h3 class="video-card__title">Doppelgangers</h3>
+        </div>
+      </article>
+    </div>
+
+    <ol class="discog">
+      {releases.map((r) => (
+        <li class="discog__item">
+          <div class="discog__year">{r.year}</div>
+          <div class="discog__detail">
+            <h3><em>{r.title}</em></h3>
+            <p class="discog__note">{r.note}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="ebook">
+      <figure class="ebook__cover">
+        <Image
+          src={ebookCover}
+          alt="The Neoclassic Approach to Shred Guitar — book cover"
+          widths={[200, 300, 400]}
+          sizes="200px"
+          loading="lazy"
+        />
+      </figure>
+      <div>
+        <p class="section-eyebrow" style="margin-bottom: 0.75rem;">Free Download</p>
+        <h3 class="ebook__title">The Neoclassic Approach to Shred Guitar</h3>
+        <p class="ebook__desc">
+          Co-authored with Sebastian Salinas (2018), this 100+ page instructional
+          book is packed with tips and lessons guaranteed to increase your guitar
+          vocabulary. Transcribed in English and Spanish — available now as a
+          free download.
+        </p>
+        <div class="ebook__downloads">
+          <a href={EBOOK_URL} class="btn btn--primary" target="_blank" rel="noopener">
+            E-Book (PDF)
+          </a>
+          <a href={AUDIO_URL} class="btn btn--ghost" target="_blank" rel="noopener">
+            Audio Files
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

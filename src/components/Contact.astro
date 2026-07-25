@@ -1,0 +1,211 @@
+---
+// Final CTA + inquiry form (Web3Forms) + EPK download + socials.
+// Get your free access key at https://web3forms.com (sends to dean@deancascione.com)
+// then replace the placeholder value below.
+const WEB3FORMS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY';
+
+// Base-relative prefix for static public/ assets (the EPK lives in public/epk).
+const assetBase = import.meta.env.BASE_URL.replace(/\/$/, '');
+const epkUrl = `${assetBase}/epk/dean_cascione_epk_2026.pdf`;
+---
+
+<section class="section" id="contact">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-eyebrow">Contact</span>
+      <h2 class="section-title">Let's Make Something Loud</h2>
+      <p class="section-subtitle">
+        Bookings, lessons, press, or prototype testing — reach out and Dean will
+        get back to you.
+      </p>
+    </div>
+
+    <div class="cta">
+      <div class="cta__inner">
+        <div class="cta__grid">
+          <div>
+            <p class="cta__lead">
+              Drop a message below, or reach Dean directly. Industry professionals
+              can grab the latest Electronic Press Kit for bookings and press.
+            </p>
+
+            <div class="cta__quick">
+              <div class="cta__quick-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M4 4h16v16H4z" fill="none" stroke="none" />
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="m2 7 10 6 10-6" />
+                </svg>
+                <a href="mailto:dean@deancascione.com">dean@deancascione.com</a>
+              </div>
+              <div class="cta__quick-row">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <path d="M14 2v6h6" />
+                  <path d="M9 13h6M9 17h4" />
+                </svg>
+                <a href={epkUrl} download>Download EPK (PDF)</a>
+              </div>
+            </div>
+
+            <div class="cta__socials">
+              <a
+                class="cta__social"
+                href="https://www.youtube.com/user/deancascione"
+                target="_blank"
+                rel="noopener"
+                aria-label="Dean Cascione on YouTube"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z" />
+                </svg>
+              </a>
+              <a
+                class="cta__social"
+                href="https://www.facebook.com/deancascione"
+                target="_blank"
+                rel="noopener"
+                aria-label="Dean Cascione on Facebook"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7v-3.5h3.1V9.4c0-3 1.8-4.7 4.6-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9v2.2h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z" />
+                </svg>
+              </a>
+              <a
+                class="cta__social"
+                href="https://www.instagram.com/deancascione"
+                target="_blank"
+                rel="noopener"
+                aria-label="Dean Cascione on Instagram"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.1.4.3 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.3 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.1-1 .3-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.3-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.1-.4-.3-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.3-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.1 1-.3 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.2 0-3.5 0-4.8.1-.9 0-1.4.2-1.7.3-.4.2-.7.4-1 .7-.3.3-.5.6-.7 1-.1.3-.3.8-.3 1.7-.1 1.3-.1 1.6-.1 4.8s0 3.5.1 4.8c0 .9.2 1.4.3 1.7.2.4.4.7.7 1 .3.3.6.5 1 .7.3.1.8.3 1.7.3 1.3.1 1.6.1 4.8.1s3.5 0 4.8-.1c.9 0 1.4-.2 1.7-.3.4-.2.7-.4 1-.7.3-.3.5-.6.7-1 .1-.3.3-.8.3-1.7.1-1.3.1-1.6.1-4.8s0-3.5-.1-4.8c0-.9-.2-1.4-.3-1.7-.2-.4-.4-.7-.7-1-.3-.3-.6-.5-1-.7-.3-.1-.8-.3-1.7-.3-1.3-.1-1.6-.1-4.8-.1zm0 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8zm0 8a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zm6.2-8.2a1.1 1.1 0 1 1-2.3 0 1.1 1.1 0 0 1 2.3 0z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <form class="contact-form" id="contactForm">
+            <input type="hidden" name="access_key" value={WEB3FORMS_KEY} />
+            <input type="hidden" name="subject" value="New Dean Cascione inquiry" />
+            {/* Honeypot field — hidden from humans, bots fill it in. */}
+            <input
+              type="checkbox"
+              name="botcheck"
+              class="contact-form__honeypot"
+              tabindex="-1"
+              autocomplete="off"
+            />
+
+            <div class="contact-form__row">
+              <div class="contact-form__field">
+                <label for="cf-name">Name</label>
+                <input
+                  type="text"
+                  id="cf-name"
+                  name="name"
+                  required
+                  autocomplete="name"
+                  placeholder="Your name"
+                />
+              </div>
+              <div class="contact-form__field">
+                <label for="cf-email">Email</label>
+                <input
+                  type="email"
+                  id="cf-email"
+                  name="email"
+                  required
+                  autocomplete="email"
+                  placeholder="you@example.com"
+                />
+              </div>
+            </div>
+
+            <div class="contact-form__field">
+              <label for="cf-interest">I'm interested in</label>
+              <select id="cf-interest" name="interest">
+                <option value="">Select a topic…</option>
+                <option value="bookings">Booking a performance</option>
+                <option value="lessons">Guitar lessons</option>
+                <option value="press">Press / EPK request</option>
+                <option value="demos">Product demo / prototype testing</option>
+                <option value="general">General inquiry</option>
+              </select>
+            </div>
+
+            <div class="contact-form__field">
+              <label for="cf-message">Message</label>
+              <textarea
+                id="cf-message"
+                name="message"
+                rows="4"
+                placeholder="Tell Dean what you have in mind…"
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--lg" id="contactSubmit">
+              Send Message
+            </button>
+            <p class="contact-form__status" id="contactStatus" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('contactForm') as HTMLFormElement | null;
+  const status = document.getElementById('contactStatus');
+  const submit = document.getElementById('contactSubmit') as HTMLButtonElement | null;
+  const nameInput = document.getElementById('cf-name') as HTMLInputElement | null;
+  const interestSelect = document.getElementById('cf-interest') as HTMLSelectElement | null;
+  const subjectInput = form?.querySelector<HTMLInputElement>('input[name="subject"]');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form || !status || !submit) return;
+
+    // Stamp a descriptive subject so the recipient can triage in their inbox.
+    if (subjectInput && nameInput && interestSelect) {
+      const parts = ['New Inquiry'];
+      if (interestSelect.value) parts.push(`for ${interestSelect.value}`);
+      if (nameInput.value) parts.push(`from ${nameInput.value}`);
+      subjectInput.value = parts.join(' ');
+    }
+
+    submit.disabled = true;
+    const originalLabel = submit.textContent;
+    submit.textContent = 'Sending…';
+    status.textContent = '';
+    status.className = 'contact-form__status';
+
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        status.textContent = 'Thanks! Your message has been sent — Dean will get back to you soon.';
+        status.classList.add('is-success');
+        form.reset();
+      } else {
+        status.textContent = 'Something went wrong. Please email dean@deancascione.com directly.';
+        status.classList.add('is-error');
+      }
+    } catch {
+      status.textContent = 'Something went wrong. Please email dean@deancascione.com directly.';
+      status.classList.add('is-error');
+    } finally {
+      submit.disabled = false;
+      submit.textContent = originalLabel;
+    }
+  });
+</script>

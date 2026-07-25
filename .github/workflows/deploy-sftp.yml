@@ -1,0 +1,100 @@
+name: Deploy to SFTP (deancascione.com)
+
+# Deploys the built site to Dean's host via SFTP (port 2222).
+# During cutover it publishes to a nested folder so the existing site
+# stays live; preview it at https://deancascione.com/<BASE_PATH>/.
+#
+# Required GitHub repo secrets (Settings → Secrets and variables → Actions):
+#   SFTP_HOST      e.g. ftp.deancascione.com
+#   SFTP_USER      FTP/SFTP username
+#   SFTP_PASSWORD  FTP/SFTP password
+# Optional:
+#   SFTP_PORT      defaults to 2222
+#
+# Notes:
+# - The host only offers legacy ssh-rsa host keys, so we re-enable it below.
+# - The SFTP session is chrooted at the web root — "/" IS deancascione.com.
+#
+# Required repo *variables* (Settings → Secrets and variables → Variables):
+#   SFTP_TARGET    remote path RELATIVE to the chroot, e.g. /new
+#                  (the SFTP session is jailed at the web root, so "/" = deancascione.com)
+#   SITE_URL       https://deancascione.com
+#   BASE_PATH      /new   (the subfolder the preview is served from)
+#
+# To cutover to the live site, change BASE_PATH=/ and point SFTP_TARGET
+# at the document root, then retire this comment.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: sftp-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy-sftp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://deancascione.com' }}
+          BASE_PATH: ${{ vars.BASE_PATH || '/new' }}
+        run: npm run build
+
+      - name: Verify build output exists
+        run: |
+          if [ ! -f dist/index.html ]; then
+            echo "::error::dist/index.html not found — build failed to produce output"
+            exit 1
+          fi
+          echo "Built $(find dist -type f | wc -l) files"
+
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Deploy via SFTP (lftp mirror)
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT || '2222' }}
+          SFTP_TARGET: ${{ vars.SFTP_TARGET || '/new' }}
+        run: |
+          # Refuse to run if SFTP_TARGET is empty or "/" — that would mirror into the
+          # live document root and --delete would wipe Dean's entire current site.
+          if [ -z "${SFTP_TARGET}" ] || [ "${SFTP_TARGET}" = "/" ]; then
+            echo "::error::SFTP_TARGET is empty or '/' — refusing to deploy to document root."
+            exit 1
+          fi
+
+          # lftp is preinstalled on ubuntu-latest runners.
+          # The host only offers legacy ssh-rsa host keys (rejected by modern OpenSSH
+          # by default), so we pass HostKeyAlgorithms=+ssh-rsa to the underlying ssh.
+          # sftp:auto-confirm bypasses the interactive host-key prompt in CI.
+          # --reverse: upload local→remote ; --delete: prune remote files no longer in dist/
+          # The unquoted heredoc lets the shell expand the SFTP_* env vars (set above).
+          lftp <<EOF
+            set sftp:auto-confirm yes;
+            set sftp:connect-program "ssh -a -x -o HostKeyAlgorithms=+ssh-rsa";
+            set net:timeout 30;
+            set net:max-retries 3;
+            open -u "${SFTP_USER},${SFTP_PASSWORD}" -p "${SFTP_PORT}" sftp://"${SFTP_HOST}";
+            mkdir -pf "${SFTP_TARGET}";
+            mirror --reverse --delete --verbose --no-perms --transfer-all dist/ "${SFTP_TARGET}/";
+            quit
+          EOF
+          echo "Deployed to ${SFTP_HOST}:${SFTP_PORT}${SFTP_TARGET}"

@@ -1,0 +1,91 @@
+---
+// Sticky glass nav · crimson "DC" mark · mobile toggle
+const { active = 'home' } = Astro.props;
+const links = [
+  { id: 'home', label: 'Home', href: '#top' },
+  { id: 'about', label: 'About', href: '#about' },
+  { id: 'music', label: 'Music', href: '#music' },
+  { id: 'endorsed', label: 'Endorsed', href: '#endorsed' },
+  { id: 'shows', label: 'Shows', href: '#shows' },
+  { id: 'gallery', label: 'Gallery', href: '#gallery' },
+];
+---
+
+<header class="nav" id="nav">
+  <div class="container nav__inner">
+    <a href="#top" class="nav__brand" aria-label="Dean Cascione — home">
+      <span class="nav__brand-mark">DC</span>
+      <span>Dean Cascione</span>
+    </a>
+
+    <nav aria-label="Primary">
+      <ul class="nav__list" id="navList">
+        {links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class:list={['nav__link', { 'is-active': active === link.id }]}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="nav__cta">
+      <a
+        href="https://www.youtube.com/user/deancascione"
+        class="nav__social"
+        target="_blank"
+        rel="noopener"
+        aria-label="Dean Cascione on YouTube"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z" />
+        </svg>
+        <span>Watch</span>
+      </a>
+      <a href="#contact" class="btn btn--primary">Bookings</a>
+      <button
+        class="nav__toggle"
+        id="navToggle"
+        aria-label="Open menu"
+        aria-expanded="false"
+      >
+        <span class="nav__toggle-bar"></span>
+        <span class="nav__toggle-bar"></span>
+        <span class="nav__toggle-bar"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Sticky scroll state — shrink + darken the bar once scrolled.
+  const nav = document.getElementById('nav');
+  const toggle = document.getElementById('navToggle');
+  const list = document.getElementById('navList');
+
+  const onScroll = () => {
+    nav?.classList.toggle('is-scrolled', window.scrollY > 24);
+  };
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Mobile menu toggle.
+  toggle?.addEventListener('click', () => {
+    const isOpen = list?.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', String(!!isOpen));
+    toggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+  });
+
+  // Auto-close the mobile menu after a link is tapped.
+  list?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      list.classList.remove('is-open');
+      toggle?.setAttribute('aria-expanded', 'false');
+      toggle?.setAttribute('aria-label', 'Open menu');
+    });
+  });
+</script>
