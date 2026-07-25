@@ -2,6 +2,13 @@
 // Footer — brand · nav columns · socials · copyright
 const year = new Date().getFullYear();
 
+// Base-relative prefix for static public/ assets (the EPK lives in public/epk).
+// On a root domain this is '/epk/...'; on GitHub Pages staging it becomes
+// '/deancascione/epk/...'. import.meta.env.BASE_URL is '/' in prod and
+// '/deancascione/' on the Pages subpath.
+const assetBase = import.meta.env.BASE_URL.replace(/\/$/, '');
+const epkUrl = `${assetBase}/epk/dean_cascione_epk_2026.pdf`;
+
 const navColumns = [
   {
     heading: 'Explore',
@@ -25,7 +32,7 @@ const navColumns = [
     heading: 'Contact',
     links: [
       { label: 'dean@deancascione.com', href: 'mailto:dean@deancascione.com' },
-      { label: 'Download EPK', href: '/epk/dean_cascione_epk_2026.pdf' },
+      { label: 'Download EPK', href: epkUrl },
       { label: 'Bookings & Lessons', href: '#contact' },
     ],
   },
