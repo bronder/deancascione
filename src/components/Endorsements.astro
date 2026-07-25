@@ -1,30 +1,31 @@
 ---
-// Endorsements — brand logo grid (logos where available, name tiles otherwise)
+// Endorsements — brand logo grid
 import { Image } from 'astro:assets';
 import floydRose from '~/assets/images/endorsements/floyd-rose.jpg';
 import seymourDuncan from '~/assets/images/endorsements/seymour-duncan.jpg';
-import sitStrings from '~/assets/images/endorsements/sit-strings.jpg';
-import tsunami from '~/assets/images/endorsements/tsunami-cables.jpg';
-import oz from '~/assets/images/endorsements/oz-guitar-works.jpg';
-import zt from '~/assets/images/endorsements/zt-amplifiers.png';
+import sitStrings from '~/assets/images/endorsements/sit_logo.png';
+import tsunami from '~/assets/images/endorsements/tsunami-cables.webp';
+import stoneTone from '~/assets/images/endorsements/stone_tone_logo.png';
+import graphtech from '~/assets/images/endorsements/graph_tech_logo.webp';
+import lizardSpit from '~/assets/images/endorsements/lizard-spit.avif';
 import dcg from '~/assets/images/endorsements/dc-custom-guitars.jpg';
+import zt from '~/assets/images/endorsements/zt-amplifiers.png';
+import oz from '~/assets/images/endorsements/oz_guitar_works_logo.png';
 
 type Endorsement = {
   name: string;
   url: string;
-  logo?: ImageMetadata;
+  logo: ImageMetadata;
 };
 
-// Brands with a usable logo image are rendered with the logo; the rest render
-// as a clean text tile (the grid handles both gracefully).
 const endorsements: Endorsement[] = [
   { name: 'Floyd Rose', url: 'https://www.floydrose.com', logo: floydRose },
   { name: 'Seymour Duncan', url: 'https://www.seymourduncan.com', logo: seymourDuncan },
   { name: 'SIT Strings', url: 'https://www.sitstrings.com', logo: sitStrings },
   { name: 'Tsunami Cables', url: 'https://www.tsunamicables.com', logo: tsunami },
-  { name: 'Stone Tone', url: 'https://stonetoneproducts.com/' },
-  { name: 'Graphtech', url: 'https://graphtech.com/' },
-  { name: 'Lizard Spit', url: 'https://www.lizardspit.com/' },
+  { name: 'Stone Tone', url: 'https://stonetoneproducts.com/', logo: stoneTone },
+  { name: 'Graphtech', url: 'https://graphtech.com/', logo: graphtech },
+  { name: 'Lizard Spit', url: 'https://www.lizardspit.com/', logo: lizardSpit },
   { name: 'DC Custom Guitars', url: 'https://dccustomguitars.com', logo: dcg },
   { name: 'ZT Amplifiers', url: 'https://www.ztamplifiers.com/', logo: zt },
   { name: 'OZ Guitar Works', url: 'https://www.ozguitarworks.com/', logo: oz },
@@ -52,18 +53,15 @@ const endorsements: Endorsement[] = [
           rel="noopener"
           aria-label={`${e.name} — visit site`}
         >
-          {e.logo && (
-            <Image
-              class="endorsement__logo"
-              src={e.logo}
-              alt={`${e.name} logo`}
-              widths={[160, 240, 320]}
-              sizes="160px"
-              loading="lazy"
-            />
-          )}
-          {!e.logo && <span class="endorsement__name" style="font-size: 1.05rem;">{e.name}</span>}
-          {e.logo && <span class="endorsement__name">{e.name}</span>}
+          <Image
+            class="endorsement__logo"
+            src={e.logo}
+            alt={`${e.name} logo`}
+            widths={[160, 240, 320]}
+            sizes="160px"
+            loading="lazy"
+          />
+          <span class="endorsement__name">{e.name}</span>
         </a>
       ))}
     </div>
