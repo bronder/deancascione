@@ -3,6 +3,9 @@
 import { Image } from 'astro:assets';
 import ebookCover from '~/assets/images/ebook-cover.jpg';
 import dioCover from '~/assets/images/dio-tribute.jpg';
+import guitarChopShopCover from '~/assets/images/guitar-chop-shop.jpg';
+import neoclassicalFireCover from '~/assets/images/neoclassical-fire.jpg';
+import shredCrusadeCover from '~/assets/images/shred-crusade.jpg';
 
 // Newest-first discography. `title` and `note` preserved verbatim from the
 // legacy bio; `video` marks releases with an embedded YouTube link.
@@ -43,11 +46,13 @@ const releases: Release[] = [
     year: '2015',
     title: 'Shred Crusade',
     note: 'Album — neoclassic metal with guest guitarists David Shankle, Dave Mercado, and Joe Stump.',
+    cover: shredCrusadeCover,
   },
   {
     year: '2011',
     title: 'Neoclassical Fire',
     note: 'Album — collaboration with keyboardist Mike Troy (Yngwie Malmsteen).',
+    cover: neoclassicalFireCover,
   },
   {
     year: '2010',
@@ -59,6 +64,7 @@ const releases: Release[] = [
     year: '2008',
     title: 'Guitar Chop Shop',
     note: 'Debut album — #1 in sales on Guitar9 charts.',
+    cover: guitarChopShopCover,
   },
 ];
 
