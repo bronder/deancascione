@@ -2,6 +2,7 @@
 // Music — featured videos + discography timeline + free e-book
 import { Image } from 'astro:assets';
 import ebookCover from '~/assets/images/ebook-cover.jpg';
+import dioCover from '~/assets/images/dio-tribute.jpg';
 
 // Newest-first discography. `title` and `note` preserved verbatim from the
 // legacy bio; `video` marks releases with an embedded YouTube link.
@@ -9,6 +10,7 @@ type Release = {
   year: string;
   title: string;
   note: string;
+  cover?: ImageMetadata;
 };
 
 const releases: Release[] = [
@@ -51,6 +53,7 @@ const releases: Release[] = [
     year: '2010',
     title: 'Magic: A Tribute to Ronnie James Dio',
     note: 'Album — worldwide release with MANOWAR, featuring instrumental cover of "Nevermore."',
+    cover: dioCover,
   },
   {
     year: '2008',
@@ -113,6 +116,11 @@ const AUDIO_URL = 'https://deancascione.com/ebook/Audio_files.rar';
     <ol class="discog">
       {releases.map((r) => (
         <li class="discog__item">
+          {r.cover && (
+            <div class="discog__cover">
+              <Image src={r.cover} alt={`Cover art — ${r.title}`} widths={[96, 128, 192]} sizes="96px" loading="lazy" />
+            </div>
+          )}
           <div class="discog__year">{r.year}</div>
           <div class="discog__detail">
             <h3><em>{r.title}</em></h3>

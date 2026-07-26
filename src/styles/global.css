@@ -687,6 +687,23 @@ a {
   align-items: baseline;
 }
 
+.discog__item:has(.discog__cover) {
+  grid-template-columns: 5rem 4rem 1fr;
+  align-items: center;
+}
+
+.discog__cover {
+  width: 4rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.discog__cover img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .discog__item:first-child {
   border-top: 1px solid var(--border);
 }
@@ -723,6 +740,12 @@ a {
   .discog__item {
     grid-template-columns: 1fr;
     gap: 0.25rem;
+  }
+  .discog__item:has(.discog__cover) {
+    grid-template-columns: 4rem 1fr;
+  }
+  .discog__item:has(.discog__cover) .discog__year {
+    display: none;
   }
 }
 
