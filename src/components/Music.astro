@@ -15,11 +15,12 @@ type Release = {
   title: string;
   note: string;
   cover?: ImageMetadata;
+  url?: string;
 };
 
 const releases: Release[] = [
-  { year: '2026', title: 'Doppelgangers', note: 'Single — collaboration with Maxxwell Carlisle.' },
-  { year: '2024', title: 'Mission Space', note: 'Single.' },
+  { year: '2026', title: 'Doppelgangers', note: 'Single — collaboration with Maxxwell Carlisle.', url: 'https://youtu.be/mkC3Xxem2Ns' },
+  { year: '2024', title: 'Mission Space', note: 'Single.', url: 'https://youtu.be/VEPlyiegWJQ' },
   { year: '2024', title: 'Odyssey of Darkness', note: 'Single — collaboration with Maxxwell Carlisle.' },
   { year: '2023', title: 'Between Two Anvils', note: 'Single — collaboration with Maxxwell Carlisle.' },
   { year: '2020', title: 'Rhoads Rising', note: 'Single — tribute to Randy Rhoads.' },
@@ -124,14 +125,27 @@ const AUDIO_URL = 'https://deancascione.com/ebook/Audio_files.rar';
     <ol class="discog">
       {releases.map((r) => (
         <li class="discog__item">
-          <div class={`discog__cover${r.cover ? '' : ' discog__cover--empty'}`}>
-            {r.cover && (
+          <div class={`discog__cover${r.cover ? '' : ' discog__cover--empty'}${r.url ? ' discog__cover--linked' : ''}`}>
+            {r.cover && r.url && (
+              <a href={r.url} target="_blank" rel="noopener" aria-label={`Watch ${r.title} on YouTube`}>
+                <Image src={r.cover} alt={`Cover art — ${r.title}`} widths={[96, 128, 192]} sizes="64px" loading="lazy" />
+              </a>
+            )}
+            {r.cover && !r.url && (
               <Image src={r.cover} alt={`Cover art — ${r.title}`} widths={[96, 128, 192]} sizes="64px" loading="lazy" />
             )}
           </div>
           <div class="discog__year">{r.year}</div>
           <div class="discog__detail">
-            <h3><em>{r.title}</em></h3>
+            <h3>
+              {r.url ? (
+                <a href={r.url} target="_blank" rel="noopener" class="discog__link">
+                  <em>{r.title}</em>
+                </a>
+              ) : (
+                <em>{r.title}</em>
+              )}
+            </h3>
             <p class="discog__note">{r.note}</p>
           </div>
         </li>
