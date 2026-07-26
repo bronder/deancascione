@@ -1,18 +1,16 @@
 ---
 // Hero — full-bleed stone-church background, big display type, social + stats
-import { Picture } from 'astro:assets';
-import heroImg from '~/assets/images/hero-bg01.png';
+import heroImg from '~/assets/images/hero-bg02.png';
 ---
 
 <section class="hero" id="top">
   <div class="hero__media">
-    <Picture
+    <img
       class="hero__img"
-      src={heroImg}
+      src={heroImg.src}
+      srcset={heroImg.srcset?.attribute}
       alt="Dean Cascione performing — neoclassical shred guitarist"
-      layout="full-width"
       loading="eager"
-      widths={[480, 768, 1024, 1280, 1600, 1920]}
       sizes="100vw"
     />
   </div>
