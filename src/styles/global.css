@@ -706,8 +706,11 @@ a {
 }
 
 .discog__cover--empty::before {
-  content: '♪';
-  font-size: 1.5rem;
+  content: 'DC';
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
   color: var(--border-strong);
 }
 
@@ -794,7 +797,7 @@ a {
     height: 3rem;
   }
   .discog__cover--empty::before {
-    font-size: 1.2rem;
+    font-size: 0.85rem;
   }
 }
 
