@@ -124,11 +124,11 @@ const AUDIO_URL = 'https://deancascione.com/ebook/Audio_files.rar';
     <ol class="discog">
       {releases.map((r) => (
         <li class="discog__item">
-          {r.cover && (
-            <div class="discog__cover">
-              <Image src={r.cover} alt={`Cover art — ${r.title}`} widths={[96, 128, 192]} sizes="96px" loading="lazy" />
-            </div>
-          )}
+          <div class={`discog__cover${r.cover ? '' : ' discog__cover--empty'}`}>
+            {r.cover && (
+              <Image src={r.cover} alt={`Cover art — ${r.title}`} widths={[96, 128, 192]} sizes="64px" loading="lazy" />
+            )}
+          </div>
           <div class="discog__year">{r.year}</div>
           <div class="discog__detail">
             <h3><em>{r.title}</em></h3>
