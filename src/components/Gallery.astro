@@ -151,6 +151,9 @@ const photos = await Promise.all(
       </p>
     </div>
 
+    {/* Mobile-only: live counter for the horizontal carousel (hidden on desktop). */}
+    <p class="gallery__counter" id="galleryCounter" aria-live="polite">1 / {photos.length}</p>
+
     <div class="gallery__grid">
       {photos.map((photo, i) => (
         <button
@@ -186,8 +189,28 @@ const photos = await Promise.all(
   const closeBtn = document.getElementById('galleryClose');
   const prevBtn = document.getElementById('galleryPrev');
   const nextBtn = document.getElementById('galleryNext');
+  const grid = document.querySelector<HTMLElement>('.gallery__grid');
+  const counter = document.getElementById('galleryCounter');
 
   let currentIndex = 0;
+
+  // Mobile carousel counter — reflect which photo is snapped into view, so
+  // users can see the scope ("3 / 58") instead of swiping blind. No-op when
+  // the grid isn't a horizontal scroller (desktop masonry).
+  function updateCounter() {
+    if (!grid || !counter) return;
+    const itemWidth = items[0]?.getBoundingClientRect().width ?? 0;
+    const gap = parseFloat(getComputedStyle(grid).columnGap || '0') || 0;
+    const step = itemWidth + gap;
+    if (step <= 0) return;
+    const i = Math.round(grid.scrollLeft / step);
+    const clamped = Math.min(Math.max(i, 0), items.length - 1);
+    counter.textContent = `${clamped + 1} / ${items.length}`;
+  }
+  grid?.addEventListener('scroll', () => {
+    window.requestAnimationFrame(updateCounter);
+  }, { passive: true });
+  updateCounter();
 
   function showImage() {
     const item = items[currentIndex];

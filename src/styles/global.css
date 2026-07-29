@@ -1241,6 +1241,17 @@ a {
   transform: scale(1.03);
 }
 
+.gallery__counter {
+  display: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Lightbox overlay */
 .gallery__lightbox {
   position: fixed;
@@ -1304,8 +1315,41 @@ a {
 }
 
 @media (max-width: 540px) {
+  /* Mobile-only horizontal scroll-snap carousel: one photo per snap with a
+     peek of the next, so the strip is obviously swipeable. Replaces the
+     single-column stack that made 58 photos an endless vertical scroll.
+     Tap a photo to open the full-screen lightbox (unchanged on desktop). */
   .gallery__grid {
-    column-count: 1;
+    column-count: unset;
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    padding-block: 0.25rem;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .gallery__grid::-webkit-scrollbar {
+    display: none;
+  }
+  .gallery__counter {
+    display: block;
+  }
+  .gallery__item {
+    flex: 0 0 82%;
+    width: 82%;
+    margin: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .gallery__item img {
+    /* Keep a consistent 4:3 cell so the strip doesn't jump in height per snap. */
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
   }
   .gallery__close { top: 1rem; right: 1rem; }
   .gallery__nav { width: 40px; height: 40px; font-size: 1.4rem; }
