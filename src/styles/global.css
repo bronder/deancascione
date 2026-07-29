@@ -1199,22 +1199,45 @@ a {
 /* ============================================================
    Photo gallery
    ============================================================ */
-.gallery__grid {
-  column-count: 2;
-  column-gap: 1rem;
+/* Horizontal scroll-snap carousel — works at every width. Mobile shows one
+   photo per snap; tablet two; desktop three (matching the old masonry's
+   density). The lightbox is still the "view large" action on click. */
+.gallery__carousel {
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
 }
 
-@media (min-width: 640px) {
-  .gallery__grid {
-    column-count: 3;
-    column-gap: 1.25rem;
-  }
+.gallery__viewport {
+  flex: 1 1 auto;
+  min-width: 0; /* allow the grid to shrink within the flex row */
+}
+
+.gallery__grid {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  /* Note: no CSS scroll-behavior:smooth here. The arrows already pass
+     {behavior:'smooth'} to scrollBy(); adding it via CSS made the #gallery
+     hash-jump leave the strip at a non-zero scrollLeft on load. */
+  scroll-padding-inline: 0;
+  padding-block: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.gallery__grid::-webkit-scrollbar {
+  display: none;
 }
 
 .gallery__item {
-  display: block;
-  width: 100%;
-  margin: 0 0 1rem;
+  /* One photo per snap on mobile; wider viewports show more via the per-view
+     flex-basis overrides below. flex-basis (not width) keeps flex layout sane. */
+  flex: 0 0 82%;
+  max-width: 82%;
+  margin: 0;
   padding: 0;
   box-shadow: 0 0 0 1px var(--border);
   border-radius: var(--radius-lg);
@@ -1222,7 +1245,23 @@ a {
   background: var(--bg-card);
   cursor: pointer;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
-  break-inside: avoid;
+  scroll-snap-align: start;
+  /* scroll-snap-stop: always is mobile-only (see the <=540px block) — on
+     desktop it would clamp arrow page-scrolls to a single item. */
+}
+
+@media (min-width: 541px) {
+  .gallery__item {
+    flex: 0 0 calc((100% - 0.75rem) / 2);
+    max-width: calc((100% - 0.75rem) / 2);
+  }
+}
+
+@media (min-width: 881px) {
+  .gallery__item {
+    flex: 0 0 calc((100% - 1.5rem) / 3);
+    max-width: calc((100% - 1.5rem) / 3);
+  }
 }
 
 .gallery__item:hover {
@@ -1234,6 +1273,10 @@ a {
   width: 100%;
   height: auto;
   display: block;
+  /* Steady 4:3 cell so the strip never jumps height between landscape and
+     portrait photos as you scroll/snap. */
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
   transition: transform 0.4s ease;
 }
 
@@ -1242,7 +1285,6 @@ a {
 }
 
 .gallery__counter {
-  display: none;
   font-size: 0.8rem;
   font-weight: 500;
   letter-spacing: 0.12em;
@@ -1250,6 +1292,43 @@ a {
   text-align: center;
   margin-bottom: 1rem;
   font-variant-numeric: tabular-nums;
+}
+
+/* Arrow buttons flanking the carousel. Hidden on touch-first widths (mobile
+   swipes instead); shown ≥541px where a mouse/trackpad is the pointer. */
+.gallery__arrow {
+  flex: 0 0 auto;
+  align-self: center;
+  width: 44px;
+  height: 44px;
+  display: none;
+  place-items: center;
+  background: var(--bg-card);
+  box-shadow: 0 0 0 1px var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.gallery__arrow:hover {
+  box-shadow: 0 0 0 1px var(--accent);
+  color: var(--accent);
+  transform: scale(1.05);
+}
+
+.gallery__arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (min-width: 541px) {
+  .gallery__arrow {
+    display: grid;
+  }
 }
 
 /* Lightbox overlay */
@@ -1315,41 +1394,22 @@ a {
 }
 
 @media (max-width: 540px) {
-  /* Mobile-only horizontal scroll-snap carousel: one photo per snap with a
-     peek of the next, so the strip is obviously swipeable. Replaces the
-     single-column stack that made 58 photos an endless vertical scroll.
-     Tap a photo to open the full-screen lightbox (unchanged on desktop). */
+  /* On touch-first widths the carousel bleeds edge-to-edge (no flanking arrows)
+     for a more immersive swipe — negative margin cancels the container gutter,
+     matching padding keeps the first/last photos aligned. */
+  .gallery__carousel {
+    /* The arrows are display:none here, so collapse the gap too. */
+    gap: 0;
+  }
   .gallery__grid {
-    column-count: unset;
-    display: flex;
-    gap: 0.75rem;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--gutter);
-    padding-block: 0.25rem;
     margin-inline: calc(var(--gutter) * -1);
     padding-inline: var(--gutter);
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
   }
-  .gallery__grid::-webkit-scrollbar {
-    display: none;
-  }
-  .gallery__counter {
-    display: block;
-  }
+  /* Touch swipes should stop at each photo, not fly past — re-apply the snap
+     stop that's omitted from the base item rule (desktop needs it off so the
+     arrow can scroll a full page of items). */
   .gallery__item {
-    flex: 0 0 82%;
-    width: 82%;
-    margin: 0;
-    scroll-snap-align: start;
     scroll-snap-stop: always;
-  }
-  .gallery__item img {
-    /* Keep a consistent 4:3 cell so the strip doesn't jump in height per snap. */
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
   }
   .gallery__close { top: 1rem; right: 1rem; }
   .gallery__nav { width: 40px; height: 40px; font-size: 1.4rem; }

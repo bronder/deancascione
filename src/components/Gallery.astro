@@ -151,27 +151,34 @@ const photos = await Promise.all(
       </p>
     </div>
 
-    {/* Mobile-only: live counter for the horizontal carousel (hidden on desktop). */}
-    <p class="gallery__counter" id="galleryCounter" aria-live="polite">1 / {photos.length}</p>
-
-    <div class="gallery__grid">
-      {photos.map((photo, i) => (
-        <button
-          class="gallery__item"
-          data-full={photo.fullSrc}
-          data-index={i}
-          aria-label={`View photo ${i + 1}: ${photo.alt}`}
-        >
-          <Image
-            src={photo.src}
-            alt={photo.alt}
-            widths={[300, 400, 500, 640]}
-            sizes="(max-width: 540px) 100vw, (max-width: 640px) 50vw, 33vw"
-            loading={i < 6 ? 'eager' : 'lazy'}
-          />
-        </button>
-      ))}
+    {/* Live counter + horizontal carousel. Arrows are pointer-driven (desktop/
+        tablet); touch devices swipe instead, so the arrows hide below 541px. */}
+    <div class="gallery__carousel">
+      <button class="gallery__arrow gallery__arrow--prev" id="galleryCarouselPrev" aria-label="Scroll gallery left" type="button">&#8249;</button>
+      <div class="gallery__viewport">
+        <p class="gallery__counter" id="galleryCounter" aria-live="polite">1 / {photos.length}</p>
+        <div class="gallery__grid" id="galleryGrid">
+          {photos.map((photo, i) => (
+            <button
+              class="gallery__item"
+              data-full={photo.fullSrc}
+              data-index={i}
+              aria-label={`View photo ${i + 1}: ${photo.alt}`}
+            >
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                widths={[300, 400, 500, 640]}
+                sizes="(max-width: 540px) 100vw, (max-width: 880px) 50vw, 33vw"
+                loading={i < 6 ? 'eager' : 'lazy'}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+      <button class="gallery__arrow gallery__arrow--next" id="galleryCarouselNext" aria-label="Scroll gallery right" type="button">&#8250;</button>
     </div>
+
 
     <div class="gallery__lightbox" id="galleryLightbox" aria-hidden="true">
       <button class="gallery__close" id="galleryClose" aria-label="Close gallery">&times;</button>
@@ -189,28 +196,68 @@ const photos = await Promise.all(
   const closeBtn = document.getElementById('galleryClose');
   const prevBtn = document.getElementById('galleryPrev');
   const nextBtn = document.getElementById('galleryNext');
-  const grid = document.querySelector<HTMLElement>('.gallery__grid');
+  const grid = document.getElementById('galleryGrid');
   const counter = document.getElementById('galleryCounter');
+  const carPrevBtn = document.getElementById('galleryCarouselPrev') as HTMLButtonElement | null;
+  const carNextBtn = document.getElementById('galleryCarouselNext') as HTMLButtonElement | null;
 
   let currentIndex = 0;
 
-  // Mobile carousel counter — reflect which photo is snapped into view, so
-  // users can see the scope ("3 / 58") instead of swiping blind. No-op when
-  // the grid isn't a horizontal scroller (desktop masonry).
-  function updateCounter() {
-    if (!grid || !counter) return;
+  // How many photos are visible across the carousel at once (1 on mobile,
+  // 2 tablet, 3 desktop). Derived live so it stays correct on resize.
+  function perView(): number {
+    if (!grid || items.length === 0) return 1;
+    const itemWidth = items[0].getBoundingClientRect().width;
+    if (itemWidth <= 0) return 1;
+    const gap = parseFloat(getComputedStyle(grid).columnGap || '0') || 0;
+    const count = Math.round((grid.clientWidth + gap) / (itemWidth + gap));
+    return Math.min(Math.max(count, 1), items.length);
+  }
+
+  // Counter reflects the visible range ("1–3 / 58"), not just the first item,
+  // because desktop/tablet show several photos per view. Also toggles the
+  // arrow disabled state at the strip's edges.
+  function updateCarousel() {
+    if (!grid) return;
     const itemWidth = items[0]?.getBoundingClientRect().width ?? 0;
     const gap = parseFloat(getComputedStyle(grid).columnGap || '0') || 0;
     const step = itemWidth + gap;
-    if (step <= 0) return;
-    const i = Math.round(grid.scrollLeft / step);
-    const clamped = Math.min(Math.max(i, 0), items.length - 1);
-    counter.textContent = `${clamped + 1} / ${items.length}`;
+    const visible = perView();
+    if (step > 0 && counter) {
+      const first = Math.round(grid.scrollLeft / step);
+      const clampedFirst = Math.min(Math.max(first, 0), items.length - 1);
+      const last = Math.min(clampedFirst + visible - 1, items.length - 1);
+      counter.textContent = visible > 1 && last > clampedFirst
+        ? `${clampedFirst + 1}–${last + 1} / ${items.length}`
+        : `${clampedFirst + 1} / ${items.length}`;
+    }
+    // Disable arrows at the ends so the affordance reflects reality.
+    const atStart = grid.scrollLeft <= 1;
+    const atEnd = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 1;
+    carPrevBtn && (carPrevBtn.disabled = atStart);
+    carNextBtn && (carNextBtn.disabled = atEnd);
   }
+
+  // Scroll by one "page" of visible photos (not a single item), matching how
+  // a user expects a multi-photo carousel to advance.
+  function scrollByPage(dir: 1 | -1) {
+    if (!grid) return;
+    const itemWidth = items[0]?.getBoundingClientRect().width ?? 0;
+    const gap = parseFloat(getComputedStyle(grid).columnGap || '0') || 0;
+    const delta = (itemWidth + gap) * perView() * dir;
+    grid.scrollBy({ left: delta, behavior: 'smooth' });
+  }
+
+  carPrevBtn?.addEventListener('click', () => scrollByPage(-1));
+  carNextBtn?.addEventListener('click', () => scrollByPage(1));
+
   grid?.addEventListener('scroll', () => {
-    window.requestAnimationFrame(updateCounter);
+    window.requestAnimationFrame(updateCarousel);
   }, { passive: true });
-  updateCounter();
+  window.addEventListener('resize', () => {
+    window.requestAnimationFrame(updateCarousel);
+  }, { passive: true });
+  updateCarousel();
 
   function showImage() {
     const item = items[currentIndex];
