@@ -396,6 +396,7 @@ a {
   inset: 0;
   z-index: -1;
   overflow: hidden;
+  background: var(--bg);
 }
 
 .hero__media::after {
@@ -416,6 +417,26 @@ a {
   height: 100%;
   object-fit: cover;
   object-position: center 20%;
+}
+
+/* Art direction: on tall/narrow screens the wide photo zooms in and crops the
+   guitar. Show the whole subject instead — the mobile crop is centered on Dean
+   and shown in full (contain), desktop keeps the full landscape (cover). */
+.hero__img--mobile {
+  object-fit: contain;
+  object-position: center;
+}
+.hero__img--desktop {
+  display: none;
+}
+
+@media (min-width: 881px) {
+  .hero__img--mobile {
+    display: none;
+  }
+  .hero__img--desktop {
+    display: block;
+  }
 }
 
 .hero__inner {

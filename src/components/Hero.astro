@@ -1,15 +1,25 @@
 ---
 // Hero — full-bleed stone-church background, big display type, social + stats
-import heroImg from '~/assets/images/hero-bg03.png';
+import heroImg from '~/assets/images/hero-bg04.png';
+import heroImgMobile from '~/assets/images/hero-bg05-mobile.png';
 ---
 
 <section class="hero" id="top">
   <div class="hero__media">
     <img
-      class="hero__img"
+      class="hero__img hero__img--mobile"
+      src={heroImgMobile.src}
+      srcset={heroImgMobile.srcset?.attribute}
+      alt="Dean Cascione performing — neoclassical shred guitarist"
+      loading="eager"
+      sizes="100vw"
+    />
+    <img
+      class="hero__img hero__img--desktop"
       src={heroImg.src}
       srcset={heroImg.srcset?.attribute}
-      alt="Dean Cascione performing — neoclassical shred guitarist"
+      alt=""
+      aria-hidden="true"
       loading="eager"
       sizes="100vw"
     />
