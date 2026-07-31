@@ -19,4 +19,5 @@ node_modules/
 screenshot-*.png
 .zcode/
 .playwright-mcp/
+.cache/
 /*.png
