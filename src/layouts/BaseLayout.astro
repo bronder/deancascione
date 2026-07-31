@@ -14,8 +14,10 @@ const {
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 // OG image: must be a stable, non-hashed absolute URL for social scrapers.
 // Served from public/og-hero-2026.jpg (never run through astro:assets).
+// The editable master is public/og-hero-2026.png; run
+// `node scripts/optimize-og.mjs` to regenerate the optimized delivery JPG.
 // Versioned filename forces Facebook/LinkedIn/Slack/iMessage to re-fetch and
-// drop their cached old preview. To regenerate: node scripts/generate-og-card.mjs
+// drop their cached old preview.
 const ogImage = new URL('og-hero-2026.jpg', Astro.site).toString();
 // Base-relative prefix for static public/ assets (favicons, manifest).
 const assetBase = import.meta.env.BASE_URL.replace(/\/$/, '');
