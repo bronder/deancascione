@@ -17,7 +17,7 @@
  * portrait's exact head position. We rely on a manually verified head
  * anchor (see HEAD_ANCHOR below) plus a face-preserving crop strategy.
  *
- * Output: public/og-hero-2026.jpg  (versioned filename busts scraper cache)
+ * Output: public/og-hero-2026-v2.jpg  (versioned filename busts scraper cache)
  *
  * Run:  node scripts/generate-og-card.mjs
  */
@@ -42,7 +42,7 @@ const H = 630;
 
 // ---- Paths ----------------------------------------------------------------
 const PORTRAIT_SRC = resolve(ROOT, 'src/assets/images/portrait.jpg');
-const OUT = resolve(ROOT, 'public/og-hero-2026.jpg');
+const OUT = resolve(ROOT, 'public/og-hero-2026-v2.jpg');
 const FONT_DIR = resolve(ROOT, '.cache/fonts');
 
 // ---- Portrait framing -----------------------------------------------------

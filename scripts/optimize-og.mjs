@@ -1,7 +1,7 @@
 /**
  * optimize-og.mjs
  *
- * Converts the master share image (public/og-hero-2026.png) into an
+ * Converts the master share image (public/og-hero-2026-v2.png) into an
  * optimized, social-scraper-friendly JPG for delivery:
  *   - flattened onto brand black (alpha -> black; harmless when already opaque)
  *   - resized to 2400x1260 (2x the 1200x630 OG spec for retina sharpness;
@@ -28,8 +28,8 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
-const SRC = resolve(ROOT, 'public/og-hero-2026.png'); // master (editable)
-const OUT = resolve(ROOT, 'public/og-hero-2026.jpg'); // delivered
+const SRC = resolve(ROOT, 'public/og-hero-2026-v2.png'); // master (editable)
+const OUT = resolve(ROOT, 'public/og-hero-2026-v2.jpg'); // delivered
 const BG = '#0a0a0a'; // brand black; alpha is flattened onto this
 
 const OUT_W = 2400;
@@ -50,7 +50,7 @@ async function main() {
 
   const after = (await sharp(OUT).metadata());
   const kb = (statSync(OUT).size / 1024).toFixed(0);
-  console.log(`✓ Wrote public/og-hero-2026.jpg  ${after.width}x${after.height}  ~${kb} KB`);
+  console.log(`✓ Wrote public/og-hero-2026-v2.jpg  ${after.width}x${after.height}  ~${kb} KB`);
 }
 
 main().catch((err) => {
