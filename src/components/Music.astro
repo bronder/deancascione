@@ -87,10 +87,14 @@ const releases: Release[] = [
   },
 ];
 
-// External download links to the existing host (per build decision: keep the
-// ~120MB e-book + audio bundle on the old host, repo stays light).
-const EBOOK_URL = 'https://deancascione.com/ebook/The%20Neoclassic%20approach%20to%20Shred%20Guitar.pdf';
-const AUDIO_URL = 'https://deancascione.com/ebook/Audio_files.rar';
+// Download links point at GitHub Release assets: the ~120MB bundle exceeds
+// GitHub's 100MB per-file commit limit and the old host's /ebook/ folder was
+// orphaned when the docroot moved to /new (release assets keep the repo light
+// and survive host changes). The original Audio_files.rar was a 0-byte file,
+// so the MP3s were re-bundled as a ZIP. To update the files, upload new
+// assets to a new release tag and repoint these URLs.
+const EBOOK_URL = 'https://github.com/bronder/deancascione/releases/download/ebook-assets-v1/The-Neoclassic-Approach-to-Shred-Guitar.pdf';
+const AUDIO_URL = 'https://github.com/bronder/deancascione/releases/download/ebook-assets-v1/Audio_files.zip';
 ---
 
 <section class="section section--elevated" id="music">
