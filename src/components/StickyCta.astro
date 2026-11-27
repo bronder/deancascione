@@ -1,0 +1,44 @@
+---
+// Mobile-only action bar. Slides up once the hero's own CTAs scroll out of
+// view, and tucks away again when the contact form is on screen, so the primary
+// conversion is always one thumb-tap away without covering the form itself.
+---
+
+<div class="sticky-cta" id="stickyCta" aria-hidden="true">
+  <a href="#music" class="sticky-cta__watch" tabindex="-1">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+    Watch
+  </a>
+  <a href="#contact" class="btn btn--primary sticky-cta__book" data-intent="bookings" tabindex="-1">
+    Book Dean
+  </a>
+</div>
+
+<script>
+  const bar = document.getElementById('stickyCta');
+  const hero = document.getElementById('top');
+  const contact = document.getElementById('contact');
+
+  if (bar && hero && contact && 'IntersectionObserver' in window) {
+    let heroVisible = true;
+    let contactVisible = false;
+    const links = bar.querySelectorAll('a');
+
+    const render = () => {
+      const show = !heroVisible && !contactVisible;
+      bar.classList.toggle('is-visible', show);
+      bar.setAttribute('aria-hidden', String(!show));
+      links.forEach((a) => (a.tabIndex = show ? 0 : -1));
+    };
+
+    new IntersectionObserver(([e]) => {
+      heroVisible = e.isIntersecting;
+      render();
+    }, { rootMargin: '0px 0px -40% 0px' }).observe(hero);
+
+    new IntersectionObserver(([e]) => {
+      contactVisible = e.isIntersecting;
+      render();
+    }, { threshold: 0.15 }).observe(contact);
+  }
+</script>

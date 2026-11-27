@@ -7,6 +7,44 @@ const WEB3FORMS_KEY = 'e617e835-6952-45e7-8042-2927b85efd93';
 // Base-relative prefix for static public/ assets (the EPK lives in public/epk).
 const assetBase = import.meta.env.BASE_URL.replace(/\/$/, '');
 const epkUrl = `${assetBase}/epk/dean_cascione_epk_2026.pdf`;
+
+// Intent-first inquiry: the visitor picks what they want before they type, and
+// the form re-tunes itself (prompt, placeholder, button) to that goal. Any link
+// on the page can deep-link a path with `data-intent="<id>"`.
+const intents = [
+  {
+    id: 'bookings',
+    label: 'Book a Show',
+    blurb: 'Festivals, clinics, trade shows, corporate & private events.',
+    placeholder: 'Event, date, city, venue size, and budget range…',
+    cta: 'Request a Booking',
+    icon: 'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z',
+  },
+  {
+    id: 'lessons',
+    label: 'Take Lessons',
+    blurb: 'Private, online, or in-studio — beginner to advanced.',
+    placeholder: 'Your level, what you want to master, online or in person…',
+    cta: 'Request Lessons',
+    icon: 'M2 6h20M2 10h20M2 14h20M2 18h20M7 4v16M13 4v16',
+  },
+  {
+    id: 'press',
+    label: 'Press & EPK',
+    blurb: 'Interviews, features, reviews, and media requests.',
+    placeholder: 'Outlet, story angle, and deadline…',
+    cta: 'Send Press Request',
+    icon: 'M4 22h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9h4M10 6h6M10 10h6M10 14h4',
+  },
+  {
+    id: 'demos',
+    label: 'Gear Demos',
+    blurb: 'Prototype testing and product demos for builders & brands.',
+    placeholder: 'Tell Dean about the product and what you need…',
+    cta: 'Pitch Your Product',
+    icon: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+  },
+];
 ---
 
 <section class="section" id="contact">
@@ -15,10 +53,34 @@ const epkUrl = `${assetBase}/epk/dean_cascione_epk_2026.pdf`;
       <span class="section-eyebrow">Contact</span>
       <h2 class="section-title">Let's Make Something Loud</h2>
       <p class="section-subtitle">
-        Bookings, lessons, press, or prototype testing — reach out and Dean will
-        get back to you.
+        Start with what you need — Dean answers every inquiry personally.
       </p>
     </div>
+
+    <fieldset class="intents" aria-label="What can Dean do for you?">
+      <legend class="sr-only">What can Dean do for you?</legend>
+      {intents.map((it, i) => (
+        <label class="intent">
+          <input
+            type="radio"
+            name="interest"
+            value={it.id}
+            form="contactForm"
+            data-placeholder={it.placeholder}
+            data-cta={it.cta}
+            checked={i === 0}
+          />
+          <span class="intent__card">
+            <svg class="intent__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d={it.icon} />
+            </svg>
+            <span class="intent__label">{it.label}</span>
+            <span class="intent__blurb">{it.blurb}</span>
+            <span class="intent__check" aria-hidden="true"></span>
+          </span>
+        </label>
+      ))}
+    </fieldset>
 
     <div class="cta">
       <div class="cta__inner">
@@ -123,29 +185,17 @@ const epkUrl = `${assetBase}/epk/dean_cascione_epk_2026.pdf`;
             </div>
 
             <div class="contact-form__field">
-              <label for="cf-interest">I'm interested in</label>
-              <select id="cf-interest" name="interest">
-                <option value="">Select a topic…</option>
-                <option value="bookings">Booking a performance</option>
-                <option value="lessons">Guitar lessons</option>
-                <option value="press">Press / EPK request</option>
-                <option value="demos">Product demo / prototype testing</option>
-                <option value="general">General inquiry</option>
-              </select>
-            </div>
-
-            <div class="contact-form__field">
               <label for="cf-message">Message</label>
               <textarea
                 id="cf-message"
                 name="message"
                 rows="4"
-                placeholder="Tell Dean what you have in mind…"
+                placeholder={intents[0].placeholder}
               ></textarea>
             </div>
 
             <button type="submit" class="btn btn--primary btn--lg" id="contactSubmit">
-              Send Message
+              {intents[0].cta}
             </button>
             <p class="contact-form__status" id="contactStatus" role="status" aria-live="polite"></p>
           </form>
@@ -160,23 +210,51 @@ const epkUrl = `${assetBase}/epk/dean_cascione_epk_2026.pdf`;
   const status = document.getElementById('contactStatus');
   const submit = document.getElementById('contactSubmit') as HTMLButtonElement | null;
   const nameInput = document.getElementById('cf-name') as HTMLInputElement | null;
-  const interestSelect = document.getElementById('cf-interest') as HTMLSelectElement | null;
+  const message = document.getElementById('cf-message') as HTMLTextAreaElement | null;
   const subjectInput = form?.querySelector<HTMLInputElement>('input[name="subject"]');
+  const radios = Array.from(
+    document.querySelectorAll<HTMLInputElement>('input[name="interest"][form="contactForm"]'),
+  );
+
+  const currentIntent = () => radios.find((r) => r.checked) ?? radios[0];
+
+  // Re-tune the form to the chosen path: prompt + button copy.
+  function applyIntent() {
+    const r = currentIntent();
+    if (!r) return;
+    if (message) message.placeholder = r.dataset.placeholder ?? '';
+    if (submit && !submit.disabled) submit.textContent = r.dataset.cta ?? 'Send Message';
+  }
+  radios.forEach((r) => r.addEventListener('change', applyIntent));
+
+  // Deep links: any element with data-intent="<id>" preselects that path, and
+  // ?intent=<id> in the URL does the same on load (handy for shared links).
+  function selectIntent(id: string | null | undefined) {
+    const r = radios.find((x) => x.value === id);
+    if (!r) return;
+    r.checked = true;
+    applyIntent();
+  }
+  document.querySelectorAll<HTMLElement>('[data-intent]').forEach((el) => {
+    el.addEventListener('click', () => selectIntent(el.dataset.intent));
+  });
+  selectIntent(new URLSearchParams(location.search).get('intent'));
+  applyIntent();
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!form || !status || !submit) return;
 
     // Stamp a descriptive subject so the recipient can triage in their inbox.
-    if (subjectInput && nameInput && interestSelect) {
+    const intent = currentIntent();
+    if (subjectInput) {
       const parts = ['New Inquiry'];
-      if (interestSelect.value) parts.push(`for ${interestSelect.value}`);
-      if (nameInput.value) parts.push(`from ${nameInput.value}`);
+      if (intent) parts.push(`for ${intent.value}`);
+      if (nameInput?.value) parts.push(`from ${nameInput.value}`);
       subjectInput.value = parts.join(' ');
     }
 
     submit.disabled = true;
-    const originalLabel = submit.textContent;
     submit.textContent = 'Sending…';
     status.textContent = '';
     status.className = 'contact-form__status';
@@ -196,6 +274,7 @@ const epkUrl = `${assetBase}/epk/dean_cascione_epk_2026.pdf`;
         status.textContent = 'Thanks! Your message has been sent — Dean will get back to you soon.';
         status.classList.add('is-success');
         form.reset();
+        selectIntent(intent?.value);
       } else {
         status.textContent = 'Something went wrong. Please email dean@deancascione.com directly.';
         status.classList.add('is-error');
@@ -205,7 +284,7 @@ const epkUrl = `${assetBase}/epk/dean_cascione_epk_2026.pdf`;
       status.classList.add('is-error');
     } finally {
       submit.disabled = false;
-      submit.textContent = originalLabel;
+      applyIntent();
     }
   });
 </script>

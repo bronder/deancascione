@@ -1075,6 +1075,10 @@ a {
   .cta__grid {
     grid-template-columns: 1fr;
   }
+  /* Phones: the form follows the intent cards directly; details come after. */
+  .cta__grid > .contact-form {
+    order: -1;
+  }
 }
 
 .cta__lead {
@@ -1136,6 +1140,124 @@ a {
 .cta__social svg {
   width: 18px;
   height: 18px;
+}
+
+/* Intent picker — big radio cards that choose the inquiry path. The radios
+   live outside the <form> markup but join it via form="contactForm". */
+.intents {
+  border: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 980px) {
+  .intents { grid-template-columns: repeat(2, 1fr); }
+}
+
+.intent {
+  position: relative;
+  cursor: pointer;
+}
+
+.intent input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intent__card {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.5rem 1.25rem 1.25rem;
+  background: var(--bg-card);
+  box-shadow: 0 0 0 1px var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease, background 0.25s ease;
+}
+
+.intent__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 80% at 0% 0%, var(--accent-soft), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.intent:hover .intent__card {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 1px var(--border-strong), var(--shadow-lg);
+}
+
+.intent input:focus-visible + .intent__card {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.intent input:checked + .intent__card {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 0 1px var(--accent), 0 18px 50px -18px var(--accent-glow);
+}
+
+.intent input:checked + .intent__card::before {
+  opacity: 1;
+}
+
+.intent__icon {
+  width: 30px;
+  height: 30px;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  transition: color 0.25s ease;
+}
+
+.intent input:checked + .intent__card .intent__icon {
+  color: var(--accent);
+}
+
+.intent__label {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.intent__blurb {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.intent__check {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--border-strong);
+  transition: box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.intent input:checked + .intent__card .intent__check {
+  background: var(--accent);
+  box-shadow: inset 0 0 0 5px var(--bg-card-hover), 0 0 0 1.5px var(--accent);
+}
+
+@media (max-width: 540px) {
+  .intents { gap: 0.625rem; }
+  .intent__card { padding: 1rem 0.875rem; }
+  .intent__icon { width: 24px; height: 24px; margin-bottom: 0.25rem; }
+  .intent__blurb { font-size: 0.78rem; }
+  .intent__check { top: 0.75rem; right: 0.75rem; width: 16px; height: 16px; }
 }
 
 /* Form */
@@ -1446,6 +1568,75 @@ a {
   .gallery__nav { width: 40px; height: 40px; font-size: 1.4rem; }
   .gallery__nav--prev { left: 0.75rem; }
   .gallery__nav--next { right: 0.75rem; }
+}
+
+.services__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ============================================================
+   Sticky mobile CTA bar
+   ============================================================ */
+.sticky-cta {
+  display: none;
+}
+
+@media (max-width: 880px) {
+  .sticky-cta {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    z-index: 90;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(18, 18, 18, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 0 0 1px var(--border-strong), 0 20px 40px -10px rgba(0, 0, 0, 0.8);
+    border-radius: 999px;
+    transform: translateY(calc(100% + 2rem));
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+  }
+
+  .sticky-cta.is-visible {
+    transform: none;
+    opacity: 1;
+  }
+
+  .sticky-cta__watch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+  }
+
+  .sticky-cta__watch svg {
+    width: 16px;
+    height: 16px;
+    color: var(--accent);
+  }
+
+  .sticky-cta__book {
+    flex: 1;
+    border-radius: 999px;
+  }
+
+  /* Keep the footer's last line clear of the floating bar. */
+  .footer {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+  }
 }
 
 /* ============================================================
