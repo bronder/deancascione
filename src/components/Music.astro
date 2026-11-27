@@ -1,5 +1,5 @@
 ---
-// Music — video jukebox (lite YouTube facades) + discography timeline
+// Music — video jukebox (lite YouTube facades) + catalog cover wall
 import { Image, getImage } from 'astro:assets';
 import dioCover from '~/assets/images/dio-tribute.jpg';
 import guitarChopShopCover from '~/assets/images/guitar-chop-shop.jpg';
@@ -26,6 +26,7 @@ type Release = {
   note: string;
   cover?: ImageMetadata;
   url?: string;
+  badge?: string;
 };
 
 // Video jukebox: one big stage + a tracklist. The stage shows an optimized
@@ -43,9 +44,9 @@ const posters = await Promise.all(
 );
 
 const releases: Release[] = [
-  { year: '2026', title: 'Doppelgangers', note: 'Single — collaboration with Maxxwell Carlisle.', cover: ytDoppelgangers, url: 'https://youtu.be/mkC3Xxem2Ns' },
-  { year: '2024', title: 'Mission Space', note: 'Single.', cover: ytMissionSpace, url: 'https://youtu.be/VEPlyiegWJQ' },
-  { year: '2024', title: 'Odyssey of Darkness', note: 'Single — collaboration with Maxxwell Carlisle.', cover: ytOdysseyDarkness, url: 'https://youtu.be/jHaTReC0d1w' },
+  { year: '2026', title: 'Doppelgangers', note: 'Single — collaboration with Maxxwell Carlisle.', cover: ytDoppelgangersHd, url: 'https://youtu.be/mkC3Xxem2Ns', badge: 'Latest' },
+  { year: '2024', title: 'Mission Space', note: 'Single.', cover: ytMissionSpaceHd, url: 'https://youtu.be/VEPlyiegWJQ' },
+  { year: '2024', title: 'Odyssey of Darkness', note: 'Single — collaboration with Maxxwell Carlisle.', cover: ytOdysseyDarknessHd, url: 'https://youtu.be/jHaTReC0d1w' },
   { year: '2023', title: 'Between Two Anvils', note: 'Single — collaboration with Maxxwell Carlisle.', cover: betweenTwoAnvilsCover },
   { year: '2020', title: 'Rhoads Rising', note: 'Single — tribute to Randy Rhoads.', cover: rhoadsRisingCover },
   {
@@ -98,11 +99,22 @@ const releases: Release[] = [
     year: '2008',
     title: 'Guitar Chop Shop',
     note: 'Debut album — #1 in sales on Guitar9 charts.',
+    badge: '#1 Guitar9',
     cover: guitarChopShopCover,
     url: 'https://www.metal-archives.com/albums/Dean_Cascione/Guitar_Chop_Shop/201566',
   },
 ];
 
+
+// "Album — ..." / "Single — ..." → kind chip + the remaining note.
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+const kindOf = (note: string) => {
+  const m = note.match(/^(Debut album|Album|Single)\b\s*(?:—\s*)?(.*)$/);
+  if (m) return { kind: m[1] === 'Debut album' ? 'Debut Album' : m[1], rest: cap(m[2].replace(/^[.\s]+/, '')) };
+  return { kind: /\blive\b/i.test(note) ? 'Live' : 'Feature', rest: note };
+};
+// YouTube releases play in the on-page jukebox (data-play) instead of leaving.
+const ytId = (url?: string) => url?.match(/youtu\.be\/([\w-]{11})/)?.[1];
 ---
 
 <section class="section section--elevated" id="music">
@@ -168,34 +180,55 @@ const releases: Release[] = [
       </ol>
     </div>
 
-    <ol class="discog">
-      {releases.map((r) => (
-        <li class="discog__item">
-          <div class={`discog__cover${r.cover ? '' : ' discog__cover--empty'}${r.url ? ' discog__cover--linked' : ''}`}>
-            {r.cover && r.url && (
-              <a href={r.url} target="_blank" rel="noopener" aria-label={`Watch ${r.title} on YouTube`}>
-                <Image src={r.cover} alt={`Cover art — ${r.title}`} widths={[96, 128, 192]} sizes="64px" loading="lazy" />
-              </a>
-            )}
-            {r.cover && !r.url && (
-              <Image src={r.cover} alt={`Cover art — ${r.title}`} widths={[96, 128, 192]} sizes="64px" loading="lazy" />
-            )}
-          </div>
-          <div class="discog__year">{r.year}</div>
-          <div class="discog__detail">
-            <h3>
-              {r.url ? (
-                <a href={r.url} target="_blank" rel="noopener" class="discog__link">
-                  <em>{r.title}</em>
-                </a>
-              ) : (
-                <em>{r.title}</em>
+    <div class="catalog-head">
+      <h3 class="catalog-head__title">The Catalog</h3>
+      <span class="catalog-head__count">{releases.length} releases · 2008–{releases[0].year}</span>
+    </div>
+
+    <ol class="catalog">
+      {releases.map((r, i) => {
+        const { kind, rest } = kindOf(r.note);
+        const play = ytId(r.url);
+        const Tag = r.url ? 'a' : 'div';
+        const linkProps = r.url
+          ? { href: r.url, target: '_blank', rel: 'noopener', 'data-play': play }
+          : {};
+        return (
+          <li class:list={['catalog__item', { 'catalog__item--feature': i === 0 }]}>
+            <Tag class="catalog__card" {...linkProps}>
+              {r.cover && (
+                <Image
+                  class="catalog__cover"
+                  src={r.cover}
+                  alt={`Cover art — ${r.title}`}
+                  widths={i === 0 ? [400, 640, 900] : [240, 360, 480]}
+                  sizes={i === 0 ? '(max-width: 640px) 100vw, 520px' : '(max-width: 640px) 50vw, 260px'}
+                  loading="lazy"
+                />
               )}
-            </h3>
-            <p class="discog__note">{r.note}</p>
-          </div>
-        </li>
-      ))}
+              <span class="catalog__shade" aria-hidden="true"></span>
+              {r.badge && <span class="catalog__badge">{r.badge}</span>}
+              {r.url && (
+                <span class="catalog__action" aria-hidden="true">
+                  {play ? (
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l10.8-6.86a1 1 0 0 0 0-1.7L9.52 4.29A1 1 0 0 0 8 5.14z" /></svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9" /></svg>
+                  )}
+                </span>
+              )}
+              <span class="catalog__info">
+                <span class="catalog__meta">
+                  <span class="catalog__year">{r.year}</span>
+                  <span class="catalog__kind">{kind}</span>
+                </span>
+                <span class="catalog__title">{r.title}</span>
+                {rest && <span class="catalog__note">{rest}</span>}
+              </span>
+            </Tag>
+          </li>
+        );
+      })}
     </ol>
   </div>
 </section>
@@ -237,6 +270,25 @@ const releases: Release[] = [
 
   playBtn?.addEventListener('click', () => play(current));
   tracks.forEach((t) => t.addEventListener('click', () => play(t)));
+
+  // Catalog: subtle 3D tilt that follows the pointer (mouse only, motion OK).
+  if (matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)').matches) {
+    document.querySelectorAll<HTMLElement>('.catalog__card').forEach((card) => {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty('--ry', `${x * 10}deg`);
+        card.style.setProperty('--rx', `${-y * 10}deg`);
+        card.style.setProperty('--gx', `${(x + 0.5) * 100}%`);
+        card.style.setProperty('--gy', `${(y + 0.5) * 100}%`);
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.removeProperty('--ry');
+        card.style.removeProperty('--rx');
+      });
+    });
+  }
 
   // External triggers (hero button etc.): scroll the stage into view, then play.
   document.querySelectorAll<HTMLElement>('[data-play]').forEach((el) => {
