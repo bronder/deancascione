@@ -376,19 +376,20 @@ a {
   pointer-events: none;
 }
 
-/* Laptop widths: tighten before anything collides. */
-@media (max-width: 1200px) {
-  .nav__list { gap: 1.5rem; }
+/* Laptop widths: tighten before anything collides (8 links + CTA). */
+@media (max-width: 1360px) {
+  .nav__social { display: none; }
   .nav__inner { gap: 1.25rem; }
+  .nav__list { gap: 1.25rem; }
+  .nav__cta .btn { padding: 0.75rem 1.25rem; }
 }
 
-@media (max-width: 1060px) {
-  .nav__social { display: none; }
-  .nav__list { gap: 1.1rem; }
+@media (max-width: 1120px) {
+  .nav__list { gap: 1rem; }
   .nav__link { font-size: 0.78rem; }
 }
 
-@media (max-width: 880px) {
+@media (max-width: 1024px) {
   /* The Bookings CTA duplicates the menu's own Book Dean button and would
      overflow the bar next to the brand + toggle on narrow phones. */
   .nav__list,
@@ -1752,6 +1753,304 @@ a.catalog__card:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .lead__book { transition: none; }
 }
+
+/* ============================================================
+   Lessons — lesson builder
+   ============================================================ */
+.lessons {
+  background:
+    radial-gradient(50% 60% at 0% 100%, rgba(200, 16, 46, 0.10), transparent 70%),
+    var(--bg-elevated);
+}
+
+.lessons__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .lessons__grid { grid-template-columns: 1fr; }
+}
+
+.lessons__intro {
+  position: sticky;
+  top: 7rem;
+}
+
+@media (max-width: 980px) {
+  .lessons__intro { position: static; }
+}
+
+.lessons__intro .section-head {
+  margin-bottom: 2rem;
+}
+
+.lessons__proof {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-bottom: 2rem;
+}
+
+.lessons__proof li {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.lessons__proof span {
+  min-width: 3.6rem;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.lessons__book-link {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--border-strong);
+}
+
+.lessons__book-link:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+.builder {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 1px var(--border), var(--shadow-lg);
+}
+
+.builder__step {
+  border: 0;
+  min-width: 0;
+}
+
+.builder__step legend {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.builder__step legend small {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+.builder__n {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #0a0a0a;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.builder input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Step 1 — format cards */
+.builder__formats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .builder__formats { grid-template-columns: 1fr; }
+}
+
+.builder__format {
+  position: relative;
+  cursor: pointer;
+}
+
+.builder__format-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.1rem;
+  border-radius: var(--radius);
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--border-strong);
+  transition: box-shadow 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.builder__format-card svg {
+  width: 26px;
+  height: 26px;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.builder__format:hover .builder__format-card { transform: translateY(-2px); }
+
+.builder__format input:checked + .builder__format-card {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 0 1.5px var(--accent), 0 14px 40px -18px var(--accent-glow);
+}
+
+.builder__format input:checked + .builder__format-card svg { color: var(--accent); }
+
+.builder__format input:focus-visible + .builder__format-card,
+.builder__level input:focus-visible + span,
+.builder__chip input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.builder__format-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.builder__format-desc {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* Step 2 — segmented level control with a sliding glider */
+.builder__levels {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+
+.builder__level {
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.builder__level span {
+  display: block;
+  padding: 0.7rem 0.5rem;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color 0.25s ease;
+}
+
+.builder__level input:checked + span { color: #0a0a0a; }
+
+.builder__level-glider {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc((100% - 8px) / 3);
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 8px 24px -8px var(--accent-glow);
+  transform: translateX(calc(var(--level, 1) * 100%));
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Step 3 — focus chips */
+.builder__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.builder__chip {
+  position: relative;
+  cursor: pointer;
+}
+
+.builder__chip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.builder__chip span::before {
+  content: '+';
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.builder__chip:hover span { color: var(--text); }
+
+.builder__chip input:checked + span {
+  background: var(--accent-soft);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.builder__chip input:checked + span::before { content: '✓'; }
+
+.builder__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.builder__summary {
+  flex: 1 1 220px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.builder__summary::first-letter {
+  color: var(--accent);
+}
+
+@media (max-width: 540px) {
+  .builder__level span { font-size: 0.7rem; letter-spacing: 0.03em; padding-inline: 0.25rem; }
+  .builder__step legend small { display: none; }
+  .builder__format-card { padding: 0.9rem 1rem; }
+}
+
 
 /* ============================================================
    Endorsements — brand logo grid

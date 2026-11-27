@@ -123,6 +123,8 @@ const assetBase = import.meta.env.BASE_URL.replace(/\/$/, '');
         '.gallery__carousel',
         '.legends__head',
         '.press',
+        '.lessons__intro',
+        '.builder__step',
       ];
       const els = document.querySelectorAll<HTMLElement>(targets.join(','));
       if (matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window) {

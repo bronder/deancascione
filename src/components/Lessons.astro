@@ -1,0 +1,155 @@
+---
+// Lessons — a three-step "lesson builder": format → level → focus areas.
+// "Request this lesson plan" hands the choices to the contact form (via the
+// `contact:prefill` event), selecting the Lessons path and pre-writing the
+// message, so a student only adds name + email. Formats come from Dean's
+// services list (private / online / in-studio lessons, private clinics).
+const formats = [
+  {
+    id: 'Online',
+    title: 'Online',
+    desc: 'One-on-one over video from anywhere — screen-share tabs, slow it down, loop it back.',
+    icon: 'M2 4h20v13H2zM8 21h8M12 17v4',
+  },
+  {
+    id: 'In-studio',
+    title: 'In-Studio',
+    desc: 'Private, in-person sessions — hands on, plugged in, real-time feedback on every note.',
+    icon: 'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z',
+  },
+  {
+    id: 'Clinic',
+    title: 'Clinics',
+    desc: 'Private guitar clinics for your group — live demo, Q&A, and hands-on technique.',
+    icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+  },
+];
+
+const levels = ['Beginner', 'Intermediate', 'Advanced'];
+
+const focus = [
+  'Picking technique',
+  'Sweep arpeggios',
+  'Neoclassical scales & modes',
+  'Speed & precision',
+  'Phrasing & vibrato',
+  'Soloing & improvisation',
+  'Theory for guitarists',
+  'Tone & gear setup',
+];
+---
+
+<section class="section lessons" id="lessons">
+  <div class="container">
+    <div class="lessons__grid">
+      <div class="lessons__intro">
+        <div class="section-head">
+          <span class="section-eyebrow">Lessons</span>
+          <h2 class="section-title">Learn Shred<br />From Dean</h2>
+          <p class="section-subtitle">
+            Private lessons from beginner to advanced, built around what you
+            want to play. Two decades on stage, a decade on the NAMM stage,
+            and a lesson book of his own — now pointed at your playing.
+          </p>
+        </div>
+        <ul class="lessons__proof">
+          <li><span>1:1</span> Every lesson is private</li>
+          <li><span>EN/ES</span> Co-author of a bilingual lesson book</li>
+          <li><span>10+</span> Years performing at NAMM</li>
+        </ul>
+        <a href="#free-book" class="lessons__book-link">Not ready yet? Start with the free e-book →</a>
+      </div>
+
+      <form class="builder" id="lessonBuilder" aria-label="Build your lesson plan">
+        <fieldset class="builder__step">
+          <legend><span class="builder__n">1</span> How do you want to learn?</legend>
+          <div class="builder__formats">
+            {formats.map((f, i) => (
+              <label class="builder__format">
+                <input type="radio" name="format" value={f.id} checked={i === 0} />
+                <span class="builder__format-card">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={f.icon} /></svg>
+                  <span class="builder__format-title">{f.title}</span>
+                  <span class="builder__format-desc">{f.desc}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset class="builder__step">
+          <legend><span class="builder__n">2</span> Where are you now?</legend>
+          <div class="builder__levels">
+            {levels.map((l, i) => (
+              <label class="builder__level">
+                <input type="radio" name="level" value={l} checked={i === 1} />
+                <span>{l}</span>
+              </label>
+            ))}
+            <span class="builder__level-glider" aria-hidden="true"></span>
+          </div>
+        </fieldset>
+
+        <fieldset class="builder__step">
+          <legend><span class="builder__n">3</span> What do you want to work on? <small>Pick any</small></legend>
+          <div class="builder__chips">
+            {focus.map((f) => (
+              <label class="builder__chip">
+                <input type="checkbox" name="focus" value={f} />
+                <span>{f}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <div class="builder__footer">
+          <p class="builder__summary" id="builderSummary" aria-live="polite"></p>
+          <button type="submit" class="btn btn--primary btn--lg">Request This Lesson Plan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  const builder = document.getElementById('lessonBuilder') as HTMLFormElement | null;
+  const summary = document.getElementById('builderSummary');
+
+  const read = () => {
+    const fd = new FormData(builder!);
+    return {
+      format: String(fd.get('format') ?? ''),
+      level: String(fd.get('level') ?? ''),
+      focus: fd.getAll('focus').map(String),
+    };
+  };
+
+  const render = () => {
+    if (!builder || !summary) return;
+    const { format, level, focus } = read();
+    const what = focus.length ? focus.join(', ').toLowerCase() : 'whatever you want to play';
+    summary.textContent = `${format} · ${level} · ${what}`;
+    // Move the level glider under the chosen level.
+    const levels = Array.from(builder.querySelectorAll<HTMLInputElement>('input[name="level"]'));
+    builder.style.setProperty('--level', String(levels.findIndex((r) => r.checked)));
+  };
+
+  builder?.addEventListener('change', render);
+  render();
+
+  builder?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const { format, level, focus } = read();
+    const lines = [
+      `Hi Dean — I'd like ${format.toLowerCase()} lessons.`,
+      `Level: ${level}`,
+      focus.length ? `I want to work on: ${focus.join(', ')}` : '',
+      '',
+      'A bit about me: ',
+    ].filter((l, i, a) => l !== '' || a[i - 1] !== '');
+    window.dispatchEvent(
+      new CustomEvent('contact:prefill', { detail: { intent: 'lessons', message: lines.join('\n') } }),
+    );
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+  });
+</script>

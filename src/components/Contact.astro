@@ -239,6 +239,16 @@ const intents = [
     el.addEventListener('click', () => selectIntent(el.dataset.intent));
   });
   selectIntent(new URLSearchParams(location.search).get('intent'));
+
+  // Prefill from other sections (e.g. the lesson builder): pick the path and
+  // pre-write the message, then land the cursor in the first empty field.
+  window.addEventListener('contact:prefill', (e) => {
+    const { intent, message: text } = (e as CustomEvent<{ intent?: string; message?: string }>).detail ?? {};
+    selectIntent(intent);
+    if (message && text) message.value = text;
+    const next = nameInput && !nameInput.value ? nameInput : message;
+    setTimeout(() => next?.focus({ preventScroll: true }), 600);
+  });
   applyIntent();
 
   form?.addEventListener('submit', async (e) => {
