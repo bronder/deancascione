@@ -90,17 +90,42 @@ import heroImgMobile from '~/assets/images/hero-bg06-mobile.png';
 
     <div class="hero__stats">
       <div class="hero__stat">
-        <span class="hero__stat-num">2+</span>
+        <span class="hero__stat-num" data-count="2" data-prefix="" data-suffix="+">2+</span>
         <span class="hero__stat-label">Decades Performing</span>
       </div>
       <div class="hero__stat">
-        <span class="hero__stat-num">#1</span>
+        <span class="hero__stat-num" data-count="1" data-prefix="#" data-suffix="" data-from="99">#1</span>
         <span class="hero__stat-label">Guitar9 Chart Debut</span>
       </div>
       <div class="hero__stat">
-        <span class="hero__stat-num">10+</span>
+        <span class="hero__stat-num" data-count="10" data-prefix="" data-suffix="+">10+</span>
         <span class="hero__stat-label">Years at NAMM</span>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  // Stats count up once on load (the #1 counts *down* from 99 — a chart climb).
+  if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    document.querySelectorAll<HTMLElement>('.hero__stat-num[data-count]').forEach((el, idx) => {
+      const to = Number(el.dataset.count);
+      const from = Number(el.dataset.from ?? 0);
+      const pre = el.dataset.prefix ?? '';
+      const suf = el.dataset.suffix ?? '';
+      const dur = 1400;
+      const delay = 900 + idx * 150;
+      el.textContent = `${pre}${from}${suf}`;
+      setTimeout(() => {
+        const t0 = performance.now();
+        const tick = (now: number) => {
+          const k = Math.min((now - t0) / dur, 1);
+          const eased = 1 - Math.pow(1 - k, 3);
+          el.textContent = `${pre}${Math.round(from + (to - from) * eased)}${suf}`;
+          if (k < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }, delay);
+    });
+  }
+</script>
