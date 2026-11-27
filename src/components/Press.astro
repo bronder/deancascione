@@ -1,0 +1,116 @@
+---
+// Press band — the critics' words, set huge. One quote at a time in a giant
+// serif italic with the key phrase in crimson, crossfading on a timer with
+// story-style progress bars (click to jump, hover/focus to pause; no
+// auto-rotate under reduced motion). Quotes are the ones already cited in
+// the bio, so nothing here is new copy.
+type Quote = { before: string; hot: string; after: string };
+
+const quotes: Quote[] = [
+  { before: '', hot: 'Dangerous', after: ' with a guitar.' },
+  {
+    before: 'A showcase of neoclassical fretboard pyrotechnics… channels the spirit of ',
+    hot: 'Rhoads',
+    after: ' and the best of Malmsteen.',
+  },
+  { before: 'A ', hot: 'bright star', after: ' on the international guitar scene.' },
+];
+---
+
+<section class="press" id="press" aria-roledescription="carousel" aria-label="What the press says">
+  <div class="press__mark" aria-hidden="true">&ldquo;</div>
+  <div class="container press__inner">
+    <span class="section-eyebrow">What the Press Says</span>
+
+    <div class="press__stage" id="pressStage">
+      {quotes.map((q, i) => (
+        <figure
+          class:list={['press__quote', { 'is-active': i === 0 }]}
+          aria-roledescription="slide"
+          aria-label={`${i + 1} of ${quotes.length}`}
+          aria-hidden={i === 0 ? undefined : 'true'}
+        >
+          <blockquote>
+            <p>&ldquo;{q.before}<em>{q.hot}</em>{q.after}&rdquo;</p>
+          </blockquote>
+          <figcaption>— Press</figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <div class="press__bars" role="tablist" aria-label="Choose a quote">
+      {quotes.map((_, i) => (
+        <button
+          type="button"
+          role="tab"
+          class:list={['press__bar', { 'is-active': i === 0 }]}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-label={`Quote ${i + 1}`}
+          data-index={i}
+        >
+          <span class="press__bar-fill"></span>
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  const section = document.querySelector<HTMLElement>('.press');
+  const slides = Array.from(document.querySelectorAll<HTMLElement>('.press__quote'));
+  const bars = Array.from(document.querySelectorAll<HTMLButtonElement>('.press__bar'));
+  const DURATION = 6500;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let index = 0;
+  let timer = 0;
+
+  function show(i: number) {
+    index = (i + slides.length) % slides.length;
+    slides.forEach((s, n) => {
+      const on = n === index;
+      s.classList.toggle('is-active', on);
+      if (on) s.removeAttribute('aria-hidden');
+      else s.setAttribute('aria-hidden', 'true');
+    });
+    bars.forEach((b, n) => {
+      b.classList.toggle('is-active', n === index);
+      b.classList.toggle('is-done', n < index);
+      b.setAttribute('aria-selected', String(n === index));
+      // Restart the fill animation on the active bar.
+      const fill = b.firstElementChild as HTMLElement | null;
+      if (fill) {
+        fill.style.animation = 'none';
+        void fill.offsetWidth;
+        fill.style.animation = '';
+      }
+    });
+    schedule();
+  }
+
+  function schedule() {
+    clearTimeout(timer);
+    if (reduced || section?.classList.contains('is-paused')) return;
+    timer = window.setTimeout(() => show(index + 1), DURATION);
+  }
+
+  bars.forEach((b) => b.addEventListener('click', () => show(Number(b.dataset.index))));
+
+  const pause = (on: boolean) => {
+    section?.classList.toggle('is-paused', on);
+    if (on) clearTimeout(timer);
+    else show(index); // restart this quote's bar + clock together
+  };
+  section?.addEventListener('mouseenter', () => pause(true));
+  section?.addEventListener('mouseleave', () => pause(false));
+  section?.addEventListener('focusin', () => pause(true));
+  section?.addEventListener('focusout', () => pause(false));
+
+  // Only run the clock while the band is on screen, starting from quote 1.
+  if (section && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => {
+      section.classList.toggle('is-inview', e.isIntersecting);
+      if (e.isIntersecting) show(index);
+      else clearTimeout(timer);
+    }, { threshold: 0.4 }).observe(section);
+  }
+</script>

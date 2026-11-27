@@ -94,7 +94,7 @@ const links = [
   const spyLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.nav__link[data-spy]'));
   const byId = new Map(spyLinks.map((a) => [a.dataset.spy!, a]));
   // Sections without their own link light up their nearest parent entry.
-  const alias: Record<string, string> = { 'free-book': 'music' };
+  const alias: Record<string, string> = { 'free-book': 'music', press: 'about' };
   const setActive = (id: string) => {
     const target = byId.get(alias[id] ?? id);
     if (!target) return;

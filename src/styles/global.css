@@ -865,26 +865,148 @@ a {
   margin-bottom: 0;
 }
 
-.about__quote {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
-  line-height: 1.45;
-  color: var(--text);
-  border-left: 3px solid var(--accent);
-  padding: 0.5rem 0 0.5rem 1.5rem;
-  margin: 2rem 0;
+/* ============================================================
+   Press — giant rotating quotes
+   ============================================================ */
+.press {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding-block: clamp(5rem, 12vw, 9rem);
+  background:
+    radial-gradient(60% 80% at 85% 50%, rgba(200, 16, 46, 0.16), transparent 70%),
+    linear-gradient(180deg, var(--bg), #0d0707 50%, var(--bg));
+  border-block: 1px solid var(--border);
 }
 
-.about__attrib {
-  display: block;
-  font-family: var(--font-body);
-  font-style: normal;
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
+.press__mark {
+  position: absolute;
+  z-index: -1;
+  top: -0.15em;
+  right: -0.02em;
+  font-family: var(--font-serif);
+  font-size: clamp(22rem, 48vw, 44rem);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(200, 16, 46, 0.28);
+  user-select: none;
+  pointer-events: none;
+}
+
+.press__stage {
+  display: grid;
+  margin-block: clamp(1.75rem, 4vw, 2.75rem);
+  min-height: clamp(11rem, 26vw, 19rem);
+  align-items: center;
+}
+
+.press__quote {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(8px);
+  visibility: hidden;
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.9s ease, visibility 0s linear 0.9s;
+}
+
+.press__quote.is-active {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  visibility: visible;
+  transition-delay: 0.15s, 0.15s, 0.15s, 0s;
+}
+
+.press__quote p {
+  max-width: 22ch;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(2.25rem, 6.2vw, 5.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+/* Long quote: step the size down so it never overwhelms. */
+.press__quote:nth-child(2) p {
+  max-width: 30ch;
+  font-size: clamp(1.75rem, 4.2vw, 3.6rem);
+  line-height: 1.08;
+}
+
+.press__quote em {
+  font-style: italic;
+  color: var(--accent);
+  text-shadow: 0 0 50px var(--accent-glow);
+}
+
+.press__quote figcaption {
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--text-dim);
-  margin-top: 0.75rem;
+}
+
+.press__bars {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 360px;
+}
+
+.press__bar {
+  flex: 1;
+  height: 22px; /* generous hit area around a 3px line */
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.press__bar::before,
+.press__bar-fill {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 2px;
+}
+
+.press__bar::before {
+  background: var(--border-strong);
+}
+
+.press__bar-fill {
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.press__bar.is-done .press__bar-fill {
+  transform: scaleX(1);
+}
+
+.press.is-inview .press__bar.is-active .press__bar-fill {
+  animation: press-fill 6.5s linear forwards;
+}
+
+.press.is-paused .press__bar.is-active .press__bar-fill {
+  animation-play-state: paused;
+}
+
+@keyframes press-fill {
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press__quote { transition: none; filter: none; transform: none; }
+  .press .press__bar.is-active .press__bar-fill { animation: none; transform: scaleX(1); }
 }
 
 /* ============================================================
