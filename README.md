@@ -49,7 +49,7 @@ src/pages/index.astro
     ├── Music        2 YouTube embeds · discography timeline · free e-book card
     ├── Endorsements 10-brand logo grid (7 logos + 3 text tiles)
     ├── Performances NAMM/Splunk/SENE/Guitar Summit highlights + services
-    ├── Gallery      58 photos · masonry · vanilla-JS lightbox (Esc/arrows/backdrop)
+    ├── Gallery      58-photo "Wall of Fame" mosaic · filters · crimson grade · lightbox
     ├── Contact      Web3Forms form + EPK PDF + socials
     └── Footer       brand · nav columns · socials · copyright
 ```
