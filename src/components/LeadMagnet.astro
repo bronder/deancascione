@@ -1,0 +1,151 @@
+---
+// Free e-book as a lead magnet: a full-width section with a 3D book, the
+// value spelled out, and a one-field email unlock. The address goes to Dean via
+// Web3Forms (same key as the contact form) so he builds a list of players who
+// want more; the download appears instantly, and a quiet "just download" link
+// keeps the book free for anyone who would rather not share an email.
+import { Image } from 'astro:assets';
+import ebookCover from '~/assets/images/ebook-cover.jpg';
+
+const WEB3FORMS_KEY = 'e617e835-6952-45e7-8042-2927b85efd93';
+
+// Download links point at GitHub Release assets: the ~120MB bundle exceeds
+// GitHub's 100MB per-file commit limit and the old host's /ebook/ folder was
+// orphaned when the docroot moved to /new (release assets keep the repo light
+// and survive host changes). The original Audio_files.rar was a 0-byte file,
+// so the MP3s were re-bundled as a ZIP. To update the files, upload new
+// assets to a new release tag and repoint these URLs.
+const EBOOK_URL = 'https://github.com/bronder/deancascione/releases/download/ebook-assets-v1/The-Neoclassic-Approach-to-Shred-Guitar.pdf';
+const AUDIO_URL = 'https://github.com/bronder/deancascione/releases/download/ebook-assets-v1/Audio_files.zip';
+
+const perks = [
+  { num: '100+', label: 'Pages of lessons' },
+  { num: '2', label: 'Languages — EN / ES' },
+  { num: 'MP3', label: 'Audio examples included' },
+];
+---
+
+<section class="section lead" id="free-book">
+  <div class="lead__glow" aria-hidden="true"></div>
+  <div class="container lead__grid">
+    <div class="lead__book-wrap">
+      <div class="lead__book">
+        <Image
+          class="lead__book-cover"
+          src={ebookCover}
+          alt="The Neoclassic Approach to Shred Guitar — book cover"
+          widths={[300, 450, 600]}
+          sizes="(max-width: 880px) 60vw, 320px"
+          loading="lazy"
+        />
+        <span class="lead__book-spine" aria-hidden="true"></span>
+        <span class="lead__book-pages" aria-hidden="true"></span>
+      </div>
+      <span class="lead__badge" aria-hidden="true">Free</span>
+    </div>
+
+    <div class="lead__body">
+      <span class="section-eyebrow">Free Download · Lessons</span>
+      <h2 class="lead__title">
+        Steal Dean's<br /><em>Neoclassical</em> Playbook
+      </h2>
+      <p class="lead__desc">
+        <em>The Neoclassic Approach to Shred Guitar</em>, co-authored with
+        Sebastian Salinas, is packed with the tips and lessons Dean uses to
+        grow a player's guitar vocabulary — written in English and Spanish,
+        with audio examples. Yours free.
+      </p>
+
+      <ul class="lead__perks">
+        {perks.map((p) => (
+          <li>
+            <span class="lead__perk-num">{p.num}</span>
+            <span class="lead__perk-label">{p.label}</span>
+          </li>
+        ))}
+      </ul>
+
+      <form class="lead__form" id="leadForm" novalidate>
+        <input type="hidden" name="access_key" value={WEB3FORMS_KEY} />
+        <input type="hidden" name="subject" value="New e-book download — fan signup" />
+        <input type="hidden" name="from_name" value="deancascione.com e-book" />
+        <input type="checkbox" name="botcheck" class="contact-form__honeypot" tabindex="-1" autocomplete="off" />
+        <label for="lead-email" class="sr-only">Email address</label>
+        <input
+          type="email"
+          id="lead-email"
+          name="email"
+          required
+          autocomplete="email"
+          placeholder="Your email"
+          class="lead__input"
+        />
+        <button type="submit" class="btn btn--primary btn--lg lead__submit" id="leadSubmit">
+          Send Me the Book
+        </button>
+      </form>
+      <p class="lead__fine" id="leadFine">
+        Instant download · No spam, ever ·
+        <a href={EBOOK_URL} target="_blank" rel="noopener" class="lead__skip">or just grab the PDF</a>
+      </p>
+
+      <div class="lead__unlocked" id="leadUnlocked" hidden>
+        <p class="lead__unlocked-msg" role="status">
+          You're in — it's all yours. Go shred.
+        </p>
+        <div class="lead__unlocked-actions">
+          <a href={EBOOK_URL} class="btn btn--primary btn--lg" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 21h16" /></svg>
+            E-Book (PDF)
+          </a>
+          <a href={AUDIO_URL} class="btn btn--ghost btn--lg" target="_blank" rel="noopener">
+            Audio Files (ZIP)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('leadForm') as HTMLFormElement | null;
+  const email = document.getElementById('lead-email') as HTMLInputElement | null;
+  const submit = document.getElementById('leadSubmit') as HTMLButtonElement | null;
+  const fine = document.getElementById('leadFine');
+  const unlocked = document.getElementById('leadUnlocked');
+
+  const unlock = () => {
+    form?.setAttribute('hidden', '');
+    fine?.setAttribute('hidden', '');
+    unlocked?.removeAttribute('hidden');
+    unlocked?.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
+  };
+
+  // Returning fans skip the form.
+  if (localStorage.getItem('dc-ebook-unlocked') === '1') unlock();
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form || !email || !submit) return;
+    if (!email.checkValidity()) {
+      email.reportValidity();
+      return;
+    }
+
+    submit.disabled = true;
+    submit.textContent = 'Unlocking…';
+
+    try {
+      await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+    } catch {
+      // Never hold the download hostage to a network hiccup.
+    }
+
+    localStorage.setItem('dc-ebook-unlocked', '1');
+    unlock();
+  });
+</script>

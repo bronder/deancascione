@@ -71,6 +71,10 @@ body {
   overflow-x: hidden;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 img, picture, video, canvas, svg {
   display: block;
   max-width: 100%;
@@ -835,57 +839,262 @@ a {
   }
 }
 
-/* E-book card */
-.ebook {
-  display: grid;
-  grid-template-columns: minmax(120px, 200px) 1fr;
-  gap: clamp(1.5rem, 4vw, 3rem);
-  align-items: center;
-  margin-top: clamp(3rem, 6vw, 4.5rem);
-  padding: clamp(1.5rem, 4vw, 2.5rem);
-  background: var(--bg-card);
-  box-shadow: 0 0 0 1px var(--border);
-  border-radius: var(--radius-lg);
+/* ============================================================
+   Lead magnet — free e-book with email unlock
+   ============================================================ */
+.lead {
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, var(--bg-elevated), var(--bg) 30%, var(--bg) 70%, var(--bg));
 }
 
-@media (max-width: 640px) {
-  .ebook {
+.lead__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(40% 60% at 22% 50%, rgba(200, 16, 46, 0.28), transparent 70%),
+    radial-gradient(30% 40% at 85% 20%, rgba(200, 16, 46, 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.lead__grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.8fr) 1.2fr;
+  gap: clamp(3rem, 7vw, 6rem);
+  align-items: center;
+}
+
+@media (max-width: 880px) {
+  .lead__grid {
     grid-template-columns: 1fr;
-    text-align: center;
+    gap: 3rem;
   }
 }
 
-.ebook__cover {
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: 0 0 0 1px var(--border-strong), var(--shadow-lg);
+/* 3D book: tilted cover + spine + page edge, straightens on hover. */
+.lead__book-wrap {
+  position: relative;
+  perspective: 1400px;
+  display: grid;
+  place-items: center;
+  padding-block: 1rem;
 }
 
-.ebook__cover img {
+.lead__book {
+  position: relative;
+  width: min(320px, 62vw);
+  aspect-ratio: 300 / 432;
+  transform-style: preserve-3d;
+  transform: rotateY(-24deg) rotateX(4deg);
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: drop-shadow(-30px 40px 40px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 60px rgba(200, 16, 46, 0.25));
+}
+
+.lead__book-wrap:hover .lead__book {
+  transform: rotateY(-8deg) rotateX(2deg) translateY(-6px);
+}
+
+.lead__book-cover {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
-  display: block;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px 6px 6px 2px;
+  transform: translateZ(14px);
 }
 
-.ebook__title {
+/* Glossy sheen + hinge crease over the cover. */
+.lead__book::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateZ(14.5px);
+  border-radius: 2px 6px 6px 2px;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.45) 0, rgba(255, 255, 255, 0.12) 2.5%, transparent 6%),
+    linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.10) 50%, transparent 60%);
+  pointer-events: none;
+}
+
+.lead__book-spine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 100%;
+  background: linear-gradient(90deg, #120406, #3a0a12 60%, #1a0508);
+  transform-origin: left center;
+  transform: rotateY(-90deg) translateX(-14px);
+}
+
+.lead__book-pages {
+  position: absolute;
+  top: 3px;
+  right: 0;
+  width: 26px;
+  height: calc(100% - 6px);
+  background: repeating-linear-gradient(90deg, #e9e4da 0 1px, #cfc8bb 1px 2px);
+  transform-origin: right center;
+  transform: rotateY(90deg) translateX(13px);
+}
+
+.lead__badge {
+  position: absolute;
+  top: 0;
+  right: max(0px, calc(50% - min(320px, 62vw) / 2 - 1.5rem));
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #0a0a0a;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  letter-spacing: 0.04em;
+  transform: rotate(12deg);
+  box-shadow: 0 0 0 6px rgba(200, 16, 46, 0.2), 0 12px 30px -8px var(--accent-glow);
+}
+
+.lead__title {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 7vw, 5.5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  text-transform: uppercase;
+  margin: 1rem 0 1.5rem;
+}
+
+.lead__title em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  text-transform: none;
+  color: var(--accent);
+  font-size: 0.9em;
+}
+
+.lead__desc {
+  color: var(--text-muted);
+  font-size: clamp(1rem, 1.4vw, 1.1rem);
+  line-height: 1.7;
+  max-width: 54ch;
+  margin-bottom: 2rem;
+}
+
+.lead__desc em {
+  color: var(--text);
+}
+
+.lead__perks {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1.25rem, 4vw, 2.5rem);
+  margin-bottom: 2.25rem;
+  padding-block: 1.25rem;
+  border-block: 1px solid var(--border);
+}
+
+.lead__perks li {
+  display: flex;
+  flex-direction: column;
+}
+
+.lead__perk-num {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  line-height: 1;
+  color: var(--accent);
+}
+
+.lead__perk-label {
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lead__form {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 560px;
+  padding: 0.4rem;
+  background: var(--bg-card);
+  border-radius: calc(var(--radius) + 0.4rem);
+  box-shadow: 0 0 0 1px var(--border-strong);
+  transition: box-shadow 0.2s ease;
+}
+
+.lead__form:focus-within {
+  box-shadow: 0 0 0 1px var(--accent), 0 16px 40px -16px var(--accent-glow);
+}
+
+.lead__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 1rem;
+  background: transparent;
+  border: 0;
+  font-size: 1rem;
+}
+
+.lead__input:focus,
+.lead__input:focus-visible {
+  outline: none;
+}
+
+.lead__submit:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+@media (max-width: 540px) {
+  .lead__form {
+    flex-direction: column;
+  }
+  .lead__input {
+    padding: 0.9rem 1rem;
+  }
+}
+
+.lead__fine {
+  margin-top: 0.875rem;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.lead__skip {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.lead__skip:hover {
+  color: var(--accent);
+}
+
+.lead__unlocked-msg {
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 400;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  margin-bottom: 0.75rem;
+  color: var(--success);
+  margin-bottom: 1rem;
 }
 
-.ebook__desc {
-  color: var(--text-muted);
-  line-height: 1.7;
-  margin-bottom: 1.5rem;
-}
-
-.ebook__downloads {
+.lead__unlocked-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lead__book { transition: none; }
 }
 
 /* ============================================================

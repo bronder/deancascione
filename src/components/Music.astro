@@ -1,7 +1,6 @@
 ---
-// Music — featured videos + discography timeline + free e-book
+// Music — featured videos + discography timeline
 import { Image } from 'astro:assets';
-import ebookCover from '~/assets/images/ebook-cover.jpg';
 import dioCover from '~/assets/images/dio-tribute.jpg';
 import guitarChopShopCover from '~/assets/images/guitar-chop-shop.jpg';
 import neoclassicalFireCover from '~/assets/images/neoclassical-fire.jpg';
@@ -87,14 +86,6 @@ const releases: Release[] = [
   },
 ];
 
-// Download links point at GitHub Release assets: the ~120MB bundle exceeds
-// GitHub's 100MB per-file commit limit and the old host's /ebook/ folder was
-// orphaned when the docroot moved to /new (release assets keep the repo light
-// and survive host changes). The original Audio_files.rar was a 0-byte file,
-// so the MP3s were re-bundled as a ZIP. To update the files, upload new
-// assets to a new release tag and repoint these URLs.
-const EBOOK_URL = 'https://github.com/bronder/deancascione/releases/download/ebook-assets-v1/The-Neoclassic-Approach-to-Shred-Guitar.pdf';
-const AUDIO_URL = 'https://github.com/bronder/deancascione/releases/download/ebook-assets-v1/Audio_files.zip';
 ---
 
 <section class="section section--elevated" id="music">
@@ -171,35 +162,5 @@ const AUDIO_URL = 'https://github.com/bronder/deancascione/releases/download/ebo
         </li>
       ))}
     </ol>
-
-    <div class="ebook">
-      <figure class="ebook__cover">
-        <Image
-          src={ebookCover}
-          alt="The Neoclassic Approach to Shred Guitar — book cover"
-          widths={[200, 300, 400]}
-          sizes="200px"
-          loading="lazy"
-        />
-      </figure>
-      <div>
-        <p class="section-eyebrow" style="margin-bottom: 0.75rem;">Free Download</p>
-        <h3 class="ebook__title">The Neoclassic Approach to Shred Guitar</h3>
-        <p class="ebook__desc">
-          Co-authored with Sebastian Salinas (2018), this 100+ page instructional
-          book is packed with tips and lessons guaranteed to increase your guitar
-          vocabulary. Transcribed in English and Spanish — available now as a
-          free download.
-        </p>
-        <div class="ebook__downloads">
-          <a href={EBOOK_URL} class="btn btn--primary" target="_blank" rel="noopener">
-            E-Book (PDF)
-          </a>
-          <a href={AUDIO_URL} class="btn btn--ghost" target="_blank" rel="noopener">
-            Audio Files
-          </a>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
