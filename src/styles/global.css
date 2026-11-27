@@ -514,6 +514,41 @@ a {
   gap: 1rem;
 }
 
+.hero__play {
+  padding-left: 0.75rem;
+  gap: 0.875rem;
+}
+
+.hero__play-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #0a0a0a;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.hero__play-icon svg {
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+}
+
+.hero__play-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.15;
+}
+
+.hero__play-kicker {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  opacity: 0.75;
+}
+
 .hero__socials {
   display: flex;
   gap: 0.75rem;
@@ -645,67 +680,262 @@ a {
 /* ============================================================
    Music — discography + videos + e-book
    ============================================================ */
-.music__videos {
+/* Video jukebox — stage + tracklist */
+.jukebox {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(1.25rem, 3vw, 2rem);
+  grid-template-columns: minmax(0, 2.1fr) minmax(260px, 1fr);
+  gap: clamp(1rem, 2.5vw, 1.5rem);
   margin-bottom: clamp(3rem, 6vw, 4.5rem);
 }
 
-@media (max-width: 720px) {
-  .music__videos {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 980px) {
+  .jukebox { grid-template-columns: 1fr; }
 }
 
-.video-card {
-  box-shadow: 0 0 0 1px var(--border);
+.jukebox__stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--bg-card);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.video-card:hover {
-  box-shadow: 0 0 0 1px var(--border-strong);
-  transform: translateY(-2px);
-}
-
-/* 16:9 responsive iframe wrapper — the iframe fills it at any width */
-.video-card__media {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%;
   background: #000;
+  box-shadow: 0 0 0 1px var(--border-strong), 0 40px 80px -30px rgba(0, 0, 0, 0.9), 0 0 120px -40px var(--accent-glow);
 }
 
-.video-card__media iframe {
+.jukebox__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s ease;
+}
+
+.jukebox__stage:hover .jukebox__poster {
+  transform: scale(1.06);
+}
+
+.jukebox__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(0deg, rgba(10, 10, 10, 0.92) 0%, rgba(10, 10, 10, 0.2) 45%, transparent 70%),
+    radial-gradient(circle at center, transparent 30%, rgba(10, 10, 10, 0.35) 100%);
+  pointer-events: none;
+}
+
+.jukebox__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(72px, 10vw, 104px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #0a0a0a;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 0 var(--accent-glow);
+  transition: transform 0.3s ease, background 0.2s ease;
+  animation: jukebox-pulse 2.4s ease-out infinite;
+}
+
+.jukebox__play svg {
+  width: 42%;
+  height: 42%;
+  margin-left: 6%;
+}
+
+.jukebox__play:hover {
+  background: var(--accent-hover);
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+@keyframes jukebox-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0.55); }
+  70% { box-shadow: 0 0 0 28px rgba(200, 16, 46, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jukebox__play { animation: none; }
+}
+
+.jukebox__caption {
+  position: absolute;
+  left: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 1.75rem);
+  right: 1rem;
+  pointer-events: none;
+}
+
+.jukebox__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+
+.jukebox__title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 400;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.jukebox__stage iframe {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   border: 0;
+  z-index: 2;
 }
 
-.video-card__body {
-  padding: 1.25rem 1.5rem 1.5rem;
+.jukebox__stage.is-playing .jukebox__play,
+.jukebox__stage.is-playing .jukebox__caption {
+  display: none;
 }
 
-.video-card__label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 0.5rem;
+.jukebox__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.video-card__title {
+.jukebox__track {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 96px 1fr auto;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem;
+  text-align: left;
+  background: var(--bg-card);
+  border: 0;
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 1px var(--border);
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.jukebox__track:hover {
+  background: var(--bg-card-hover);
+  transform: translateX(3px);
+}
+
+.jukebox__track.is-active {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 0 1px var(--accent), inset 3px 0 0 var(--accent);
+}
+
+.jukebox__num {
   font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 400;
-  letter-spacing: 0.02em;
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  width: 1.5rem;
+}
+
+.jukebox__track.is-active .jukebox__num {
+  color: var(--accent);
+}
+
+.jukebox__thumb {
+  width: 96px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.jukebox__meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.jukebox__track-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1.05;
   text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.jukebox__track-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Little equalizer that dances on the playing track. */
+.jukebox__eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+  opacity: 0;
+}
+
+.jukebox__eq i {
+  width: 3px;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 1px;
+  transform-origin: bottom;
+  animation: jukebox-eq 0.9s ease-in-out infinite;
+}
+
+.jukebox__eq i:nth-child(2) { animation-delay: -0.3s; }
+.jukebox__eq i:nth-child(3) { animation-delay: -0.6s; }
+
+.jukebox__track.is-playing .jukebox__eq { opacity: 1; }
+
+@keyframes jukebox-eq {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+.jukebox__more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+  transition: color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.jukebox__more svg {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+
+.jukebox__more:hover {
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+@media (max-width: 540px) {
+  .jukebox__track { grid-template-columns: 72px 1fr auto; }
+  .jukebox__num { display: none; }
+  .jukebox__thumb { width: 72px; }
 }
 
 /* Discography timeline */

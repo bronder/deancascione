@@ -1,6 +1,6 @@
 ---
-// Music — featured videos + discography timeline
-import { Image } from 'astro:assets';
+// Music — video jukebox (lite YouTube facades) + discography timeline
+import { Image, getImage } from 'astro:assets';
 import dioCover from '~/assets/images/dio-tribute.jpg';
 import guitarChopShopCover from '~/assets/images/guitar-chop-shop.jpg';
 import neoclassicalFireCover from '~/assets/images/neoclassical-fire.jpg';
@@ -14,6 +14,9 @@ import darkLordCover from '~/assets/images/dark-lord-rises.webp';
 import ytDoppelgangers from '~/assets/images/yt-doppelgangers.jpg';
 import ytMissionSpace from '~/assets/images/yt-mission-space.jpg';
 import ytOdysseyDarkness from '~/assets/images/yt-odyssey-of-darkness.jpg';
+import ytDoppelgangersHd from '~/assets/images/yt-doppelgangers-hd.jpg';
+import ytMissionSpaceHd from '~/assets/images/yt-mission-space-hd.jpg';
+import ytOdysseyDarknessHd from '~/assets/images/yt-odyssey-of-darkness-hd.jpg';
 
 // Newest-first discography. `title` and `note` preserved verbatim from the
 // legacy bio; `video` marks releases with an embedded YouTube link.
@@ -24,6 +27,20 @@ type Release = {
   cover?: ImageMetadata;
   url?: string;
 };
+
+// Video jukebox: one big stage + a tracklist. The stage shows an optimized
+// poster (no YouTube JS/cookies until the visitor presses play), then swaps in
+// a youtube-nocookie iframe with autoplay. Anything with data-play="<id>"
+// elsewhere on the page (e.g. the hero) can start a track.
+type Video = { id: string; title: string; label: string; year: string; poster: ImageMetadata; thumb: ImageMetadata };
+const videos: Video[] = [
+  { id: 'mkC3Xxem2Ns', title: 'Doppelgangers', label: 'New Single · feat. Maxxwell Carlisle', year: '2026', poster: ytDoppelgangersHd, thumb: ytDoppelgangers },
+  { id: 'VEPlyiegWJQ', title: 'Mission Space', label: 'Original', year: '2024', poster: ytMissionSpaceHd, thumb: ytMissionSpace },
+  { id: 'jHaTReC0d1w', title: 'Odyssey of Darkness', label: 'feat. Maxxwell Carlisle', year: '2024', poster: ytOdysseyDarknessHd, thumb: ytOdysseyDarkness },
+];
+const posters = await Promise.all(
+  videos.map((v) => getImage({ src: v.poster, width: 1280, format: 'webp', quality: 78 })),
+);
 
 const releases: Release[] = [
   { year: '2026', title: 'Doppelgangers', note: 'Single — collaboration with Maxxwell Carlisle.', cover: ytDoppelgangers, url: 'https://youtu.be/mkC3Xxem2Ns' },
@@ -99,38 +116,56 @@ const releases: Release[] = [
       </p>
     </div>
 
-    <div class="music__videos">
-      <article class="video-card">
-        <div class="video-card__media">
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/VEPlyiegWJQ"
-            title="Dean Cascione — Mission Space"
-            loading="lazy"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          ></iframe>
+    <div class="jukebox" id="jukebox">
+      <div class="jukebox__stage" id="jukeboxStage">
+        <Image
+          class="jukebox__poster"
+          id="jukeboxPoster"
+          src={videos[0].poster}
+          alt=""
+          widths={[640, 960, 1280]}
+          sizes="(max-width: 980px) 100vw, 860px"
+          loading="lazy"
+        />
+        <div class="jukebox__shade" aria-hidden="true"></div>
+        <button class="jukebox__play" id="jukeboxPlay" type="button" aria-label={`Play ${videos[0].title}`}>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l10.8-6.86a1 1 0 0 0 0-1.7L9.52 4.29A1 1 0 0 0 8 5.14z" /></svg>
+        </button>
+        <div class="jukebox__caption">
+          <p class="jukebox__label" id="jukeboxLabel">{videos[0].label}</p>
+          <h3 class="jukebox__title" id="jukeboxTitle">{videos[0].title}</h3>
         </div>
-        <div class="video-card__body">
-          <p class="video-card__label">Original</p>
-          <h3 class="video-card__title">Mission Space</h3>
-        </div>
-      </article>
+      </div>
 
-      <article class="video-card">
-        <div class="video-card__media">
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/mkC3Xxem2Ns"
-            title="Dean Cascione & Maxxwell Carlisle — Doppelgangers"
-            loading="lazy"
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          ></iframe>
-        </div>
-        <div class="video-card__body">
-          <p class="video-card__label">Latest Release · feat. Maxxwell Carlisle</p>
-          <h3 class="video-card__title">Doppelgangers</h3>
-        </div>
-      </article>
+      <ol class="jukebox__list" aria-label="Videos">
+        {videos.map((v, i) => (
+          <li>
+            <button
+              type="button"
+              class:list={['jukebox__track', { 'is-active': i === 0 }]}
+              data-id={v.id}
+              data-title={v.title}
+              data-label={v.label}
+              data-poster={posters[i].src}
+              aria-label={`Play ${v.title}`}
+            >
+              <span class="jukebox__num">{String(i + 1).padStart(2, '0')}</span>
+              <Image class="jukebox__thumb" src={v.thumb} alt="" widths={[160, 240]} sizes="96px" loading="lazy" />
+              <span class="jukebox__meta">
+                <span class="jukebox__track-title">{v.title}</span>
+                <span class="jukebox__track-label">{v.year} · {v.label}</span>
+              </span>
+              <span class="jukebox__eq" aria-hidden="true"><i></i><i></i><i></i></span>
+            </button>
+          </li>
+        ))}
+        <li>
+          <a class="jukebox__more" href="https://www.youtube.com/user/deancascione?sub_confirmation=1" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z" /></svg>
+            Subscribe on YouTube
+          </a>
+        </li>
+      </ol>
     </div>
 
     <ol class="discog">
@@ -164,3 +199,53 @@ const releases: Release[] = [
     </ol>
   </div>
 </section>
+
+<script>
+  const stage = document.getElementById('jukeboxStage');
+  const poster = document.getElementById('jukeboxPoster') as HTMLImageElement | null;
+  const playBtn = document.getElementById('jukeboxPlay');
+  const titleEl = document.getElementById('jukeboxTitle');
+  const labelEl = document.getElementById('jukeboxLabel');
+  const tracks = Array.from(document.querySelectorAll<HTMLButtonElement>('.jukebox__track'));
+  let current = tracks[0];
+
+  function select(track: HTMLButtonElement) {
+    current = track;
+    tracks.forEach((t) => t.classList.toggle('is-active', t === track));
+    if (titleEl) titleEl.textContent = track.dataset.title ?? '';
+    if (labelEl) labelEl.textContent = track.dataset.label ?? '';
+    playBtn?.setAttribute('aria-label', `Play ${track.dataset.title}`);
+  }
+
+  function play(track: HTMLButtonElement) {
+    if (!stage) return;
+    select(track);
+    stage.querySelector('iframe')?.remove();
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube-nocookie.com/embed/${track.dataset.id}?autoplay=1&rel=0&modestbranding=1`;
+    iframe.title = `Dean Cascione — ${track.dataset.title}`;
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+    stage.appendChild(iframe);
+    stage.classList.add('is-playing');
+    tracks.forEach((t) => t.classList.toggle('is-playing', t === track));
+    if (poster && track.dataset.poster) {
+      poster.removeAttribute('srcset');
+      poster.src = track.dataset.poster;
+    }
+  }
+
+  playBtn?.addEventListener('click', () => play(current));
+  tracks.forEach((t) => t.addEventListener('click', () => play(t)));
+
+  // External triggers (hero button etc.): scroll the stage into view, then play.
+  document.querySelectorAll<HTMLElement>('[data-play]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      const track = tracks.find((t) => t.dataset.id === el.dataset.play);
+      if (!track || !stage) return;
+      e.preventDefault();
+      stage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      play(track);
+    });
+  });
+</script>
