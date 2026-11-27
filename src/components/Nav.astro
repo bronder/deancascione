@@ -21,16 +21,22 @@ const links = [
 
     <nav aria-label="Primary">
       <ul class="nav__list" id="navList">
-        {links.map((link) => (
-          <li>
+        {links.map((link, i) => (
+          <li style={`--i: ${i}`}>
             <a
               href={link.href}
+              data-spy={link.href.slice(1)}
               class:list={['nav__link', { 'is-active': active === link.id }]}
             >
+              <span class="nav__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               {link.label}
             </a>
           </li>
         ))}
+        <li class="nav__menu-cta" style={`--i: ${links.length}`}>
+          <a href="#contact" class="btn btn--primary btn--lg" data-intent="bookings">Book Dean</a>
+          <a href="mailto:dean@deancascione.com" class="nav__menu-mail">dean@deancascione.com</a>
+        </li>
       </ul>
     </nav>
 
@@ -60,33 +66,62 @@ const links = [
       </button>
     </div>
   </div>
+  <div class="nav__progress" id="navProgress" aria-hidden="true"></div>
 </header>
 
 <script>
-  // Sticky scroll state — shrink + darken the bar once scrolled.
   const nav = document.getElementById('nav');
   const toggle = document.getElementById('navToggle');
   const list = document.getElementById('navList');
+  const progress = document.getElementById('navProgress');
 
+  // Sticky state + reading-progress line, batched into one rAF per scroll.
+  let ticking = false;
   const onScroll = () => {
-    nav?.classList.toggle('is-scrolled', window.scrollY > 24);
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      nav?.classList.toggle('is-scrolled', scrollY > 24);
+      progress?.style.setProperty('--p', String(max > 0 ? scrollY / max : 0));
+      ticking = false;
+    });
   };
   document.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  // Mobile menu toggle.
-  toggle?.addEventListener('click', () => {
-    const isOpen = list?.classList.toggle('is-open');
-    toggle.setAttribute('aria-expanded', String(!!isOpen));
-    toggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
-  });
-
-  // Auto-close the mobile menu after a link is tapped.
-  list?.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      list.classList.remove('is-open');
-      toggle?.setAttribute('aria-expanded', 'false');
-      toggle?.setAttribute('aria-label', 'Open menu');
+  // Scrollspy: highlight the section currently under the reading line.
+  const spyLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.nav__link[data-spy]'));
+  const byId = new Map(spyLinks.map((a) => [a.dataset.spy!, a]));
+  // Sections without their own link light up their nearest parent entry.
+  const alias: Record<string, string> = { 'free-book': 'music' };
+  const setActive = (id: string) => {
+    const target = byId.get(alias[id] ?? id);
+    if (!target) return;
+    spyLinks.forEach((a) => {
+      const on = a === target;
+      a.classList.toggle('is-active', on);
+      if (on) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
     });
+  };
+  const spy = new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+    { rootMargin: '-45% 0px -50% 0px' },
+  );
+  document.querySelectorAll('main section[id]').forEach((sec) => spy.observe(sec));
+
+  // Mobile: full-screen menu overlay.
+  const setOpen = (open: boolean) => {
+    list?.classList.toggle('is-open', open);
+    nav?.classList.toggle('is-menu-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+    toggle?.setAttribute('aria-expanded', String(open));
+    toggle?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  };
+  toggle?.addEventListener('click', () => setOpen(!list?.classList.contains('is-open')));
+  list?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && list?.classList.contains('is-open')) setOpen(false);
   });
 </script>
