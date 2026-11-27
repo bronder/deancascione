@@ -7,16 +7,7 @@
 import { Image } from 'astro:assets';
 import ebookCover from '~/assets/images/ebook-cover.jpg';
 
-const WEB3FORMS_KEY = 'e617e835-6952-45e7-8042-2927b85efd93';
-
-// Download links point at GitHub Release assets: the ~120MB bundle exceeds
-// GitHub's 100MB per-file commit limit and the old host's /ebook/ folder was
-// orphaned when the docroot moved to /new (release assets keep the repo light
-// and survive host changes). The original Audio_files.rar was a 0-byte file,
-// so the MP3s were re-bundled as a ZIP. To update the files, upload new
-// assets to a new release tag and repoint these URLs.
-const EBOOK_URL = 'https://github.com/bronder/deancascione/releases/download/ebook-assets-v1/The-Neoclassic-Approach-to-Shred-Guitar.pdf';
-const AUDIO_URL = 'https://github.com/bronder/deancascione/releases/download/ebook-assets-v1/Audio_files.zip';
+import { EBOOK_URL, AUDIO_URL, WEB3FORMS_KEY } from '~/lib/ebook';
 
 const perks = [
   { num: '100+', label: 'Pages of lessons' },
@@ -108,6 +99,8 @@ const perks = [
 </section>
 
 <script>
+  import { isUnlocked, signup, UNLOCK_EVENT } from '~/lib/ebook';
+
   const form = document.getElementById('leadForm') as HTMLFormElement | null;
   const email = document.getElementById('lead-email') as HTMLInputElement | null;
   const submit = document.getElementById('leadSubmit') as HTMLButtonElement | null;
@@ -118,11 +111,11 @@ const perks = [
     form?.setAttribute('hidden', '');
     fine?.setAttribute('hidden', '');
     unlocked?.removeAttribute('hidden');
-    unlocked?.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
   };
 
-  // Returning fans skip the form.
-  if (localStorage.getItem('dc-ebook-unlocked') === '1') unlock();
+  // Returning fans (or a signup via the slide-in) skip the form.
+  if (isUnlocked()) unlock();
+  window.addEventListener(UNLOCK_EVENT, unlock);
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -131,21 +124,9 @@ const perks = [
       email.reportValidity();
       return;
     }
-
     submit.disabled = true;
     submit.textContent = 'Unlocking…';
-
-    try {
-      await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(Object.fromEntries(new FormData(form))),
-      });
-    } catch {
-      // Never hold the download hostage to a network hiccup.
-    }
-
-    localStorage.setItem('dc-ebook-unlocked', '1');
-    unlock();
+    await signup(form);
+    unlocked?.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
   });
 </script>

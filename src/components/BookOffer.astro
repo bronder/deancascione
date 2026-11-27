@@ -1,0 +1,139 @@
+---
+// Engagement-timed slide-in for the free e-book. Polite by design:
+//  - appears only after real engagement (scrolled half the page, or 40s on it)
+//  - never while the e-book section or the contact form is on screen
+//  - never for anyone who already unlocked the book
+//  - once per session; closing it snoozes it for 7 days
+// Signing up here unlocks the book everywhere (shared ~/lib/ebook helper).
+import { Image } from 'astro:assets';
+import ebookCover from '~/assets/images/ebook-cover.jpg';
+import { EBOOK_URL, AUDIO_URL, WEB3FORMS_KEY } from '~/lib/ebook';
+---
+
+<aside class="offer" id="bookOffer" aria-labelledby="offerTitle" hidden>
+  <button type="button" class="offer__close" id="offerClose" aria-label="Close offer">&times;</button>
+  <Image class="offer__cover" src={ebookCover} alt="" widths={[120, 180]} sizes="72px" loading="lazy" />
+  <div class="offer__body">
+    <p class="offer__kicker">Free · 100+ pages · EN/ES</p>
+    <h2 class="offer__title" id="offerTitle">Get Dean's shred lesson book</h2>
+
+    <form class="offer__form" id="offerForm" novalidate>
+      <input type="hidden" name="access_key" value={WEB3FORMS_KEY} />
+      <input type="hidden" name="subject" value="New e-book download — fan signup (slide-in)" />
+      <input type="hidden" name="from_name" value="deancascione.com e-book" />
+      <input type="checkbox" name="botcheck" class="contact-form__honeypot" tabindex="-1" autocomplete="off" />
+      <label for="offer-email" class="sr-only">Email address</label>
+      <input type="email" id="offer-email" name="email" required autocomplete="email" placeholder="Your email" />
+      <button type="submit" class="btn btn--primary" id="offerSubmit">Send it</button>
+    </form>
+
+    <div class="offer__done" id="offerDone" hidden>
+      <p role="status">It's yours — go shred.</p>
+      <div class="offer__links">
+        <a href={EBOOK_URL} target="_blank" rel="noopener">E-Book (PDF)</a>
+        <a href={AUDIO_URL} target="_blank" rel="noopener">Audio (ZIP)</a>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<script>
+  import { isUnlocked, signup, UNLOCK_EVENT } from '~/lib/ebook';
+
+  const offer = document.getElementById('bookOffer');
+  const closeBtn = document.getElementById('offerClose');
+  const form = document.getElementById('offerForm') as HTMLFormElement | null;
+  const email = document.getElementById('offer-email') as HTMLInputElement | null;
+  const submit = document.getElementById('offerSubmit') as HTMLButtonElement | null;
+  const done = document.getElementById('offerDone');
+
+  const SNOOZE_KEY = 'dc-ebook-offer-snoozed-until';
+  const SEEN_KEY = 'dc-ebook-offer-seen';
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+
+  const store = {
+    get: (s: Storage, k: string) => { try { return s.getItem(k); } catch { return null; } },
+    set: (s: Storage, k: string, v: string) => { try { s.setItem(k, v); } catch { /* ignore */ } },
+  };
+
+  const snoozed = Number(store.get(localStorage, SNOOZE_KEY) ?? 0) > Date.now();
+  const eligible = offer && !isUnlocked() && !snoozed && !store.get(sessionStorage, SEEN_KEY);
+
+  if (offer && eligible) {
+    // Hold off while the book or the contact form is already in front of them.
+    const blockers = ['free-book', 'contact']
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    const blocking = new Set<Element>();
+    let engaged = false;
+    let shown = false;
+
+    const maybeShow = () => {
+      if (shown || !engaged || blocking.size > 0 || isUnlocked()) return;
+      shown = true;
+      store.set(sessionStorage, SEEN_KEY, '1');
+      offer.removeAttribute('hidden');
+      requestAnimationFrame(() => requestAnimationFrame(() => offer.classList.add('is-open')));
+    };
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => (e.isIntersecting ? blocking.add(e.target) : blocking.delete(e.target)));
+      if (blocking.size > 0 && shown && !offer.classList.contains('is-done')) {
+        offer.classList.remove('is-open'); // tuck away; it returns when they scroll on
+      } else if (shown && blocking.size === 0 && !offer.classList.contains('is-closed')) {
+        offer.classList.add('is-open');
+      }
+      maybeShow();
+    }, { threshold: 0.2 });
+    blockers.forEach((b) => io.observe(b));
+
+    const engage = () => {
+      engaged = true;
+      maybeShow();
+    };
+    setTimeout(engage, 40_000);
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      if (max > 0 && scrollY / max > 0.5) {
+        removeEventListener('scroll', onScroll);
+        engage();
+      }
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  const close = () => {
+    offer?.classList.remove('is-open');
+    offer?.classList.add('is-closed');
+    store.set(localStorage, SNOOZE_KEY, String(Date.now() + WEEK));
+    setTimeout(() => offer?.setAttribute('hidden', ''), 500);
+  };
+  closeBtn?.addEventListener('click', close);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && offer?.classList.contains('is-open')) close();
+  });
+
+  const finish = () => {
+    form?.setAttribute('hidden', '');
+    done?.removeAttribute('hidden');
+    offer?.classList.add('is-done');
+  };
+  // Unlocked elsewhere (the e-book section)? Then this offer has done its job.
+  window.addEventListener(UNLOCK_EVENT, () => {
+    if (offer?.classList.contains('is-open')) finish();
+    else offer?.setAttribute('hidden', '');
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form || !email || !submit) return;
+    if (!email.checkValidity()) {
+      email.reportValidity();
+      return;
+    }
+    submit.disabled = true;
+    submit.textContent = '…';
+    await signup(form);
+    finish();
+  });
+</script>
