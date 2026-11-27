@@ -102,7 +102,7 @@ const galleryPhotos: Array<{ src: ImageMetadata; alt: string }> = [
   { src: g35, alt: 'Dean Cascione with Ronnie North' },
   { src: g36, alt: 'Dean Cascione at Splunk Conf' },
   { src: g37, alt: 'Dean Cascione with Rudy Sarzo' },
-  { src: g38, alt: 'Dean Cascione with Adrian Vandenburg' },
+  { src: g38, alt: 'Dean Cascione with Adrian Vandenberg' },
   { src: g39, alt: 'Dean Cascione — California shoot' },
   { src: g40, alt: 'Dean Cascione with Brad Gillis and Floyd Rose' },
   { src: g41, alt: 'Dean Cascione with Joe Stump' },
@@ -183,7 +183,10 @@ const photos = await Promise.all(
     <div class="gallery__lightbox" id="galleryLightbox" aria-hidden="true">
       <button class="gallery__close" id="galleryClose" aria-label="Close gallery">&times;</button>
       <button class="gallery__nav gallery__nav--prev" id="galleryPrev" aria-label="Previous photo">&#8249;</button>
-      <img class="gallery__fullimg" id="galleryFullImg" src="" alt="" />
+      <figure class="gallery__figure">
+        <img class="gallery__fullimg" id="galleryFullImg" src="" alt="" />
+        <figcaption class="gallery__caption" id="galleryCaption"></figcaption>
+      </figure>
       <button class="gallery__nav gallery__nav--next" id="galleryNext" aria-label="Next photo">&#8250;</button>
     </div>
   </div>
@@ -198,6 +201,7 @@ const photos = await Promise.all(
   const nextBtn = document.getElementById('galleryNext');
   const grid = document.getElementById('galleryGrid');
   const counter = document.getElementById('galleryCounter');
+  const caption = document.getElementById('galleryCaption');
   const carPrevBtn = document.getElementById('galleryCarouselPrev') as HTMLButtonElement | null;
   const carNextBtn = document.getElementById('galleryCarouselNext') as HTMLButtonElement | null;
 
@@ -262,8 +266,10 @@ const photos = await Promise.all(
   function showImage() {
     const item = items[currentIndex];
     if (!item || !fullImg) return;
+    const alt = item.querySelector('img')?.alt ?? '';
     fullImg.src = item.dataset.full ?? '';
-    fullImg.alt = item.getAttribute('aria-label') ?? '';
+    fullImg.alt = alt;
+    if (caption) caption.textContent = `${alt}  ·  ${currentIndex + 1} / ${items.length}`;
   }
 
   function open(index: number) {
@@ -307,6 +313,12 @@ const photos = await Promise.all(
   // Click the backdrop (not a child) to close.
   lightbox?.addEventListener('click', (e) => {
     if (e.target === lightbox) close();
+  });
+
+  // Other sections (e.g. the Legends marquee) can open a specific photo.
+  window.addEventListener('gallery:open', (e) => {
+    const index = (e as CustomEvent<{ index: number }>).detail?.index;
+    if (Number.isInteger(index) && index >= 0 && index < items.length) open(index);
   });
 
   // Keyboard: Esc closes, arrows navigate — only when lightbox is open.

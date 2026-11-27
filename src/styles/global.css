@@ -616,6 +616,116 @@ a {
 }
 
 /* ============================================================
+   Legends — kinetic name marquee (social proof)
+   ============================================================ */
+.legends {
+  position: relative;
+  padding-block: clamp(3rem, 7vw, 5rem);
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+.legends__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.legends__title {
+  font: inherit;
+}
+
+.legends__hint {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.legends__row {
+  display: flex;
+  overflow: hidden;
+  /* Soft fade at both edges so names glide in and out of darkness. */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.legends__row + .legends__row {
+  margin-top: clamp(0.25rem, 1vw, 0.75rem);
+}
+
+.legends__track {
+  display: flex;
+  flex-shrink: 0;
+  width: max-content;
+  animation: legends-scroll 60s linear infinite;
+}
+
+.legends__row--right .legends__track {
+  animation-direction: reverse;
+  animation-duration: 70s;
+}
+
+.legends__row:hover .legends__track,
+.legends__row:focus-within .legends__track {
+  animation-play-state: paused;
+}
+
+@keyframes legends-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.legends__set {
+  list-style: none;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.legends__set li {
+  display: flex;
+  align-items: center;
+}
+
+.legends__name {
+  padding: 0 clamp(0.75rem, 2vw, 1.5rem);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 8vw, 6.5rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text);
+  transition: color 0.25s ease, -webkit-text-stroke-color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.legends__name--outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(245, 245, 245, 0.45);
+}
+
+.legends__name:hover,
+.legends__name:focus-visible {
+  color: var(--accent);
+  -webkit-text-stroke-color: var(--accent);
+  text-shadow: 0 0 40px var(--accent-glow);
+}
+
+.legends__sep {
+  color: var(--accent);
+  font-size: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legends__track { animation: none; }
+  .legends__row { overflow-x: auto; }
+}
+
+/* ============================================================
    About — bio prose + pull-quote + portrait
    ============================================================ */
 .about {
@@ -1939,9 +2049,28 @@ a {
   display: flex;
 }
 
+.gallery__figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  pointer-events: none; /* backdrop clicks around the photo still close */
+}
+
+.gallery__caption {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  padding-inline: 4rem;
+}
+
 .gallery__fullimg {
+  pointer-events: auto;
   max-width: 90vw;
-  max-height: 85vh;
+  max-height: 80vh;
   border-radius: var(--radius);
   object-fit: contain;
 }

@@ -1,0 +1,80 @@
+---
+// "In good company" — instant credibility right under the hero. Two giant
+// marquees of the players Dean is pictured with, running in opposite
+// directions. Every name is a button that opens the matching photo in the
+// gallery lightbox (Gallery listens for the `gallery:open` event).
+// `photo` is the 0-based index into Gallery.astro's galleryPhotos array.
+type Legend = { name: string; photo: number };
+
+const rowA: Legend[] = [
+  { name: 'Jason Becker', photo: 4 },
+  { name: 'George Lynch', photo: 17 },
+  { name: 'Vinnie Moore', photo: 27 },
+  { name: 'Uli Jon Roth', photo: 0 },
+  { name: 'Michael Angelo Batio', photo: 3 },
+  { name: 'Chris Impellitteri', photo: 11 },
+  { name: 'Jeff Loomis', photo: 16 },
+  { name: 'Andy Timmons', photo: 43 },
+  { name: 'Bruce Kulick', photo: 24 },
+];
+
+const rowB: Legend[] = [
+  { name: 'Rudy Sarzo', photo: 36 },
+  { name: 'Brad Gillis', photo: 39 },
+  { name: 'Adrian Vandenberg', photo: 37 },
+  { name: 'Joe Stump', photo: 7 },
+  { name: 'Tony Rombola', photo: 30 },
+  { name: 'Kelly Simonz', photo: 41 },
+  { name: 'Jimi Bell', photo: 9 },
+  { name: 'Kelly Garni', photo: 28 },
+  { name: 'Matthew Mills', photo: 22 },
+];
+
+const rows = [
+  { items: rowA, dir: 'left' },
+  { items: rowB, dir: 'right' },
+];
+---
+
+<section class="legends" aria-labelledby="legends-title">
+  <div class="container legends__head">
+    <h2 class="legends__title" id="legends-title">
+      <span class="section-eyebrow">In Good Company</span>
+    </h2>
+    <p class="legends__hint">Pictured with the players who built the genre — tap a name to see the photo.</p>
+  </div>
+
+  {rows.map((row) => (
+    <div class={`legends__row legends__row--${row.dir}`}>
+      <div class="legends__track">
+        {[0, 1].map((copy) => (
+          <ul class="legends__set" aria-hidden={copy === 1 ? 'true' : undefined}>
+            {row.items.map((l, i) => (
+              <li>
+                <button
+                  type="button"
+                  class:list={['legends__name', { 'legends__name--outline': i % 2 === 1 }]}
+                  data-photo={l.photo}
+                  tabindex={copy === 1 ? -1 : undefined}
+                >
+                  {l.name}
+                </button>
+                <span class="legends__sep" aria-hidden="true">✦</span>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    </div>
+  ))}
+</section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.legends__name').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      window.dispatchEvent(
+        new CustomEvent('gallery:open', { detail: { index: Number(btn.dataset.photo) } }),
+      );
+    });
+  });
+</script>
